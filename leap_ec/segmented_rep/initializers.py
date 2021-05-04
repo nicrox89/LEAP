@@ -39,3 +39,22 @@ def create_segmented_sequence(length, seq_initializer):
 
     return segments
 
+
+
+##############################
+# Closure create_matrix_sequence
+##############################
+def create_matrix_sequence(length, seq_initializer):
+
+    if callable(length):
+        num_segments = length()
+    else:
+        num_segments = length
+
+    seqs = [] # Save sequences for next step
+    for i in range(num_segments):
+        seq = create_segmented_sequence(4, seq_initializer) # a sample - check float
+        seqs.append(seq)
+
+    return seqs
+

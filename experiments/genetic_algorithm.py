@@ -1,38 +1,42 @@
+import sys
 from leap_ec.algorithm import generational_ea
 from leap_ec import representation, ops
 
+from classifier import binaryClassifier
 
-from leap_ec.segmented_rep import initializers, decoder
-from leap_ec.segmented_rep.problems import f as function
+from leap_ec.segmented_rep import initializers, decoders
+from problems import fitness
 from leap_ec.real_rep.initializers import create_real_vector
 from leap_ec.segmented_rep.initializers import create_segmented_sequence
 from leap_ec.segmented_rep.ops import apply_mutation
 
 from leap_ec.problem import FunctionProblem
 
-from experiments.classifier import binaryClassifier
+p = fitness(binaryClassifier())
 
 bounds = ((0, 1), (0, 1), (0, 1), (0, 1)) # 4 variables normalized between 0 and 1
 
+gene_size = 6
 pop_size = 5
 
 #THE MATRIX
 seqs = [] # Save sequences for next step
 for i in range(pop_size):
-    seq = create_segmented_sequence(4, create_real_vector(bounds)) # a sample
+    seq = create_segmented_sequence(gene_size, create_real_vector(bounds)) # a sample - check float
     seqs.append(seq)
 
+p.f(seq)
 
 ea = generational_ea(generations=10, pop_size=pop_size,
 
                      # Solve a MaxOnes Boolean optimization problem
-                     problem=FunctionProblem(function, True),
+                     problem=FunctionProblem(p.f, True),
 
                      representation=representation.Representation(
                          # Genotype and phenotype are the same for this task
                          decoder=decoder.IdentityDecoder(),
                          # Initial genomes are random binary sequences
-                         initialize=initializers.create_binary_sequence(length=10)
+                         initialize=initializers.create_segmented_sequence(gene_size, create_real_vector(bounds))
                      ),
 
                      # The operator pipeline
