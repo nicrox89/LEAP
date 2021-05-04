@@ -26,3 +26,5 @@ python-coveralls
 sphinx
 sphinx_rtd_theme
 toolz
+future
+pyitlib
