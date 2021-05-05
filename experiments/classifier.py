@@ -67,20 +67,22 @@ def binaryClassifier():
 
     # Split-out Validation Dataset and Create Test Variables
     array = dataset.values
-    X = array[:,0:4].astype(float)
-    Y = array[:,4].astype(float)
+    #X = array[:,0:4].astype(float)
+    #Y = array[:,4].astype(float)
+    X = array[:,0:4]
+    Y = array[:,4]
     print('Split Data: X')
     print(X)
     print('Split Data: Y')
     print(Y)
 
 
-    # normalize X_train 0-1
-    for i in range(len(X[0])):
-        lower_bound = np.min(X[:,i])
-        upper_bound = np.max(X[:,i])
-        for j in range(len(X[:,0])):
-            X[j][i] = (X[j][i]-lower_bound) / (upper_bound - lower_bound)
+    # # normalize X_train 0-1
+    # for i in range(len(X[0])):
+    #     lower_bound = np.min(X[:,i])
+    #     upper_bound = np.max(X[:,i])
+    #     for j in range(len(X[:,0])):
+    #         X[j][i] = (X[j][i]-lower_bound) / (upper_bound - lower_bound)
 
 
     validation_size = 0.20
