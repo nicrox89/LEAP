@@ -488,6 +488,7 @@ def tournament_selection(population: List, k: int = 2) -> Iterator:
         :return: the best of k individuals drawn from population
     """
     while True:
+        #choose k individuals (2 at a time) a select the best one
         choices = random.choices(population, k=k)
         best = max(choices)
 

@@ -39,5 +39,6 @@ class fitness():
             den=den+1
         if den!=0:
             res = num/den
-            print(res)
+            print("MI:",res)
+            print("num features:",den)
         return res

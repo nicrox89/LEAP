@@ -20,8 +20,12 @@ def print_population(population, generation):
     :param generation:
     :return: None
     """
+    
+
     for individual in population:
-        print(generation, individual.genome, individual.fitness)
+        print("generation", generation)
+        print(individual.genome)
+        print(individual.fitness)
 
 
 ###############################
