@@ -59,18 +59,19 @@ def binaryClassifier():
     print(dataset.head())
 
     # Drop the data we don't want to use
-    dataset.drop(labels=["workclass","education.num","race","marital.status","capital.loss","education","occupation","relationship","native.country","fnlwgt"], axis = 1, inplace = True)
+    dataset.drop(labels=["workclass","education","occupation","relationship","native.country","fnlwgt"], axis = 1, inplace = True)
     print('Dataset with Dropped Labels')
     print(dataset.head())
 
-    feature_names=["age","sex","capital.gain","hours.per.week","income"]
+    feature_names=["age","education.num","marital.status","race","sex","capital.gain","capital.loss","hours.per.week","income"]
+
 
     # Split-out Validation Dataset and Create Test Variables
     array = dataset.values
     #X = array[:,0:4].astype(float)
     #Y = array[:,4].astype(float)
-    X = array[:,0:4]
-    Y = array[:,4]
+    X = array[:,0:8]
+    Y = array[:,8]
     print('Split Data: X')
     print(X)
     print('Split Data: Y')
