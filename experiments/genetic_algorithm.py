@@ -28,7 +28,7 @@ p = fitness(binaryClassifier())
 #number of individuals(matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 12
+gene_size = 30
 
 #bounds = ((0, 1), (0, 1), (0, 1), (0, 1)) # 4 variables normalized between 0 and 1
 bounds = ((17,90), (0, 1), (0,99999), (1,99)) # 4 variables original bounds (int)
@@ -106,7 +106,7 @@ util.print_population(parents, generation=0)
 generation_counter = util.inc_generation(context=context)
 
 #results = []
-while generation_counter.generation() < 6:
+while generation_counter.generation() < 20:
     p.setStat()
     #sequence of functions, the result of the first one will be the parameter of the next one, and so on
     offspring = pipe(parents,
@@ -135,19 +135,19 @@ while generation_counter.generation() < 6:
     count=0
     parents_pairs={}
 
-    for i in range(parents):
+    for i in range(len(parents)):
         parents_pairs[i] = parents[i].fitness
     
     import operator
     sorted_d = sorted(parents_pairs.items(), key=operator.itemgetter(1))
 
-    for key, value in sorted_d.iteritems():
-        print("generation", context['leap']['generation'])
-        count=count+1
-        print("individual", count)
-        print(parents[key].genome)
-        print(parents[key].fitness)
-
+    #for key, value in sorted_d:
+        #print("generation", context['leap']['generation'])
+        #count=count+1
+        #print("individual", count)
+        #print(parents[key].genome)
+        #print(parents[key].fitness)
+        #print(p.getStat()[key])
     #for individual in parents:
     #    print("generation", context['leap']['generation'])
     #    print(p.getStat()[count])
@@ -155,8 +155,15 @@ while generation_counter.generation() < 6:
     #    print("individual", count)
         #print(individual.genome)
     #    print(individual.fitness)
+    print("generation", context['leap']['generation'])
 
-print("best:")
-print(probe.best_of_gen(parents).fitness)
+    print("worst: ",p.getStat()[sorted_d[0][0]])
+    print("best: ", p.getStat()[sorted_d[-1][0]])
+    print()
+    print(probe.best_of_gen(parents))
+    print(probe.best_of_gen(parents).fitness)
+    print()
+    #print(p.getStat()[key])
+
 
         

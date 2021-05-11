@@ -31,7 +31,7 @@ class fitness():
         den = 0
         num = 0
         res = 0
-        threshold = sum(M) * 0.7
+        threshold = sum(M) * 0.4
         M.sort(reverse=True)
 
         #den = 0
