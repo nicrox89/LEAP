@@ -8,6 +8,7 @@ class fitness():
 
     def __init__(self, c):
         self.classifier = c
+        self.stat = []
 
     def f(self, chromosome):
         num_genes = len(chromosome[0]) # columns
@@ -30,7 +31,7 @@ class fitness():
         den = 0
         num = 0
         res = 0
-        threshold = sum(M) * 0.3
+        threshold = sum(M) * 0.7
         M.sort(reverse=True)
 
         #den = 0
@@ -39,6 +40,13 @@ class fitness():
             den=den+1
         if den!=0:
             res = num/den
-            print("MI:",res)
-            print("num features:",den)
+        self.stat.append([res,den])
+            #print("MI:",res)
+            #print("num features:",den)
         return res
+
+    def getStat(self):
+        return self.stat
+
+    def setStat(self):
+        self.stat = []
