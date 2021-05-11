@@ -26,9 +26,9 @@ p = fitness(binaryClassifier())
 
 
 #number of individuals(matrixs)
-pop_size = 20
+pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 10
+gene_size = 12
 
 #bounds = ((0, 1), (0, 1), (0, 1), (0, 1)) # 4 variables normalized between 0 and 1
 bounds = ((17,90), (0, 1), (0,99999), (1,99)) # 4 variables original bounds (int)
@@ -105,33 +105,49 @@ util.print_population(parents, generation=0)
 # generation_counter is an optional convenience for generation tracking
 generation_counter = util.inc_generation(context=context)
 
+#results = []
 while generation_counter.generation() < 6:
+    p.setStat()
     #sequence of functions, the result of the first one will be the parameter of the next one, and so on
     offspring = pipe(parents,
+                     #probe.print_individual(prefix='before tournament: '),
                      ops.tournament_selection,
+                     #probe.print_individual(prefix='after tournament: \n'),
                      ops.clone,
-                     mutate_bitflip,
-                     #util.print_individual(prefix='before mutation: '),
+                     #mutate_bitflip,
+                     #probe.print_individual(prefix='before mutation: '),
                      #individual_mutate_randint,
-                     #util.print_individual(prefix='after mutation: '),
+                     #probe.print_individual(prefix='after mutation: '),
+                     #probe.print_individual(prefix='before crossover: \n'),
                      ops.uniform_crossover(p_swap=0.2),
+                     #probe.print_individual(prefix='after crossover: \n\n\n'),
                      ops.evaluate,
                      ops.pool(size=len(parents)))  # accumulate offspring
 
     parents = offspring
+
+    #print(probe.best_of_gen(parents))
 
     generation_counter()  # increment to the next generation
 
     #util.print_population(parents, context['leap']['generation'])
     
     count=0
+    parents_pairs=[]
+
+    for individual in parents:
+        parents_pair.append([])
+    parents.sort()
 
     for individual in parents:
         print("generation", context['leap']['generation'])
+        print(p.getStat()[count])
         count=count+1
         print("individual", count)
-        print(individual.genome)
+        #print(individual.genome)
         print(individual.fitness)
 
-    #probe.best_of_gen(parents)
+print("best:")
+print(probe.best_of_gen(parents).fitness)
+
         
