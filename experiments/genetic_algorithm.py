@@ -19,19 +19,26 @@ from leap_ec.context import context
 from toolz import pipe
 from leap_ec.int_rep.ops import mutate_randint, individual_mutate_randint
 import random
+from pyitlib import discrete_random_variable as drv
+import numpy as np
 
 from leap_ec.problem import FunctionProblem
 
-p = fitness(binaryClassifier())
+classifier = binaryClassifier()
+p = fitness(classifier)
 
 
 #number of individuals(matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
 gene_size = 30
+num_genes = 8
+
+#"age","education.num","marital.status","race","sex","capital.gain","capital.loss","hours.per.week","income"]
 
 #bounds = ((0, 1), (0, 1), (0, 1), (0, 1)) # 4 variables normalized between 0 and 1
-bounds = ((17,90), (0, 1), (0,99999), (1,99)) # 4 variables original bounds (int)
+bounds = ((17,90),(1,16),(0,1),(0,4),(0,1),(0,99999),(0,4356),(1,99)) # 4 variables original bounds (int)
+
 
 # #THE MATRIX
 # seqs = [] # Save sequences for next step
@@ -160,10 +167,20 @@ while generation_counter.generation() < 20:
     print("worst: ",p.getStat()[sorted_d[0][0]])
     print("best: ", p.getStat()[sorted_d[-1][0]])
     print()
-    print(probe.best_of_gen(parents))
+    best = probe.best_of_gen(parents)
+    print(best)
     print(probe.best_of_gen(parents).fitness)
     print()
     #print(p.getStat()[key])
 
+    y = []
+    #predict
+    for i in range(len(best.genome)):
+        y.append(classifier.predict([best.genome[i]])[0])
 
+    ch = np.array(best.genome)
+
+    print("MUTUAL INFO - BEST INDIVIDUAL")
+    for i in range(num_genes):
+        print(drv.information_mutual(ch[:,i],np.array(y),cartesian_product=True))
         
