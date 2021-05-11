@@ -133,19 +133,28 @@ while generation_counter.generation() < 6:
     #util.print_population(parents, context['leap']['generation'])
     
     count=0
-    parents_pairs=[]
+    parents_pairs={}
 
-    for individual in parents:
-        parents_pair.append([])
-    parents.sort()
+    for i in range(parents):
+        parents_pairs[i] = parents[i].fitness
+    
+    import operator
+    sorted_d = sorted(parents_pairs.items(), key=operator.itemgetter(1))
 
-    for individual in parents:
+    for key, value in sorted_d.iteritems():
         print("generation", context['leap']['generation'])
-        print(p.getStat()[count])
         count=count+1
         print("individual", count)
+        print(parents[key].genome)
+        print(parents[key].fitness)
+
+    #for individual in parents:
+    #    print("generation", context['leap']['generation'])
+    #    print(p.getStat()[count])
+    #    count=count+1
+    #    print("individual", count)
         #print(individual.genome)
-        print(individual.fitness)
+    #    print(individual.fitness)
 
 print("best:")
 print(probe.best_of_gen(parents).fitness)
