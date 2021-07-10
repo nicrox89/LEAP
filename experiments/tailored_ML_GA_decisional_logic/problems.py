@@ -60,6 +60,7 @@ class fitness():
             vect_XYZ.append(np.array(y))
             vect_XZ.append(ch[:,i])
             vect_XYZ.append(ch[:,i])
+
             for j in range(num_genes):
                 if (i != j):
                     condIndexes.append(j)
@@ -67,7 +68,7 @@ class fitness():
                     vect_YZ.append(ch[:,j])
                     vect_XYZ.append(ch[:,j])
                     vect_Z.append(ch[:,j])
-                    
+
                     print("Single Conditional Mutual Information drv")
                     print(Var[i],"-",Var[j])
                     c = drv.information_mutual_conditional(ch[:,i],np.array(y),ch[:,j],cartesian_product=True)
@@ -92,6 +93,13 @@ class fitness():
             H_XYZ = drv.entropy_joint(vect_XYZ, base=2, fill_value=-1, estimator='ML', Alphabet_X=None, keep_dims=False)
             H_YZ = drv.entropy_joint(vect_YZ, base=2, fill_value=-1, estimator='ML', Alphabet_X=None, keep_dims=False)
             C_MI = (H_XZ-H_Z)-(H_XYZ-H_YZ)
+
+            # H_YZ = drv.entropy_joint(vect_XZ, base=2, fill_value=-1, estimator='ML', Alphabet_X=None, keep_dims=False)
+            # H_Z = drv.entropy_joint(vect_Z, base=2, fill_value=-1, estimator='ML', Alphabet_X=None, keep_dims=False)
+            # H_YXZ = drv.entropy_joint(vect_XYZ, base=2, fill_value=-1, estimator='ML', Alphabet_X=None, keep_dims=False)
+            # H_XZ = drv.entropy_joint(vect_YZ, base=2, fill_value=-1, estimator='ML', Alphabet_X=None, keep_dims=False)
+            # CMI_test = (H_XZ-H_Z)-(H_XYZ-H_YZ)
+
             print("Multiple Conditional Mutual Information")
             print(Var[i])
             print(C_MI)
@@ -104,13 +112,19 @@ class fitness():
             print("Mutual Information")
             print(M[i])
 
-                    #mi.append(drv.information_mutual_conditional(a,np.array(y),b,cartesian_product=True))
-                    #mi.append(drv.information_mutual_conditional(np.array(y),a,b,cartesian_product=True))
-                    #M.append(drv.information_mutual_conditional(ch[:,i],ch[:,i+1],np.array(y),cartesian_product=True))
-                    #M.append(mutual_info_score(ch[:,i],np.array(y),contingency=None))
-                    #M.append(normalized_mutual_info_score(ch[:,i],np.array(y),average_method='arithmetic'))
-                    #M.append(mutual_info_regression(ch[:,i],np.array(y),discrete_features='auto'))
-            
+
+
+
+
+        
+
+            #mi.append(drv.information_mutual_conditional(a,np.array(y),b,cartesian_product=True))
+            #mi.append(drv.information_mutual_conditional(np.array(y),a,b,cartesian_product=True))
+            #M.append(drv.information_mutual_conditional(ch[:,i],ch[:,i+1],np.array(y),cartesian_product=True))
+            #M.append(mutual_info_score(ch[:,i],np.array(y),contingency=None))
+            #M.append(normalized_mutual_info_score(ch[:,i],np.array(y),average_method='arithmetic'))
+            #M.append(mutual_info_regression(ch[:,i],np.array(y),discrete_features='auto'))
+    
         #------v2.0
         #dictionary Variables-MI
 
