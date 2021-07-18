@@ -5,7 +5,8 @@
 from math import nan, isnan
 from copy import deepcopy
 from functools import total_ordering
-
+import random
+import numpy as np
 
 ##############################
 # Class Individual
@@ -59,6 +60,7 @@ class Individual:
         self.problem = problem
         self.decoder = decoder
         self.fitness = None
+        self.partition = None
 
     @classmethod
     def create_population(cls, n, initialize, decoder, problem):
@@ -74,8 +76,14 @@ class Individual:
         """
         # genomes = initialize(n)
         # assert(len(genomes) == n)
-        return [cls(genome=initialize(), decoder=decoder, problem=problem) for _
+        pop = [cls(genome=initialize(), decoder=decoder, problem=problem) for _
                 in range(n)]
+        print("QUI")
+        print(pop)
+        for individual in pop:
+            individual.set_Partition()
+            print(individual)
+        return pop
 
     @classmethod
     def evaluate_population(cls, population):
@@ -143,6 +151,16 @@ class Individual:
         """
         self.fitness = self.evaluate_imp()
         return self.fitness
+
+    def set_Partition(self):
+        num_genes = len(self.genome[0])
+        num_partition_features = random.randint(1,num_genes-1)
+        partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
+        selected_partition_features_index=np.zeros(num_genes)
+        selected_partition_features_index[partition_features_index]=1
+        ch = self.genome.append(selected_partition_features_index)
+        selected_partition = ch[0:-1,[x==1 for x in ch[-1]]]
+        self.partition = selected_partition
 
     def __iter__(self):
         """
