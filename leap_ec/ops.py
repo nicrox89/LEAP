@@ -274,7 +274,7 @@ def clone(next_individual: Iterator) -> Iterator:
 ##############################
 @curry
 @iteriter_op
-def uniform_crossover(next_individual: Iterator,
+def _uniform_crossover(next_individual: Iterator,
                       p_swap: float = 0.5) -> Iterator:
     """ Generator for recombining two individuals and passing them down the
     line.
@@ -308,14 +308,24 @@ def uniform_crossover(next_individual: Iterator,
         :return: a copy of both individuals with individual.genome bits
                  swapped based on probability
         """
-        if len(ind1.genome) != len(ind2.genome):
+        if len(ind1.genome[0]) != len(ind2.genome[0]):
             # TODO what about variable length genomes?
             raise RuntimeError(
                 'genomes must be same length for uniform crossover')
 
-        for i in range(len(ind1.genome)):
+        ind_A = np.array(ind1.genome) #
+        ind_B = np.array(ind2.genome) #
+        ind_TMP = copy(ind_A) #
+
+        for i in range(len(ind1.genome[0])):
             if random.random() < p_swap:
-                ind1.genome[i], ind2.genome[i] = ind2.genome[i], ind1.genome[i]
+                ind_TMP[:, i] = ind_B[:, i] #
+                ind_B[:, i] = ind_A[:, i] #
+                ind_A[:, i] = ind_TMP[:, i] #
+                #ind1.genome[:,i], ind2.genome[:,i] = ind2.genome[:,i], ind1.genome[:,i]
+
+        ind1.genome = list(ind_A) #
+        ind2.genome = list(ind_B) #
 
         return ind1, ind2
 

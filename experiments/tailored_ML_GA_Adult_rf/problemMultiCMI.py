@@ -14,20 +14,20 @@ import copy
 
 class fitness():
 
-    def __init__(self, d):
-        self.decide = d
+    def __init__(self, c):
+        self.classifier = c
         self.stat = []
 
     def f(self, chromosome):
         num_genes = len(chromosome[0]) # columns
-        Var = ["age","gender","marital_status","education","lift_heavy_weight"]
+        Var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
         y = []
         single_contribution = []
 
         #predict
         #len(chromosome) = (observations)
         for i in range(len(chromosome)-1): #to remove the last row that represents the selected partition bit
-            y.append(self.decide([chromosome[i]]))
+            y.append(self.classifier.predict([chromosome[i]])[0])
 
         selected_partition_features_index = chromosome[-1]
 
@@ -80,8 +80,8 @@ class fitness():
         #OF = multi_contribution_chain + (-num_partition_features+1)
         #OF = multi_contribution_chain * math.exp(-num_partition_features)
         #OF = MI 
-        #OF = multi_contribution_chain/num_partition_features
-        OF = multi_contribution_chain - ((num_partition_features-1)/(num_genes-1))
+        OF = multi_contribution_chain/num_partition_features
+        #OF = multi_contribution_chain - ((num_partition_features-1)/(num_genes-1))
 
         self.stat.append([OF,partition_name,num_partition_features])
 

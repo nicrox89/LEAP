@@ -117,15 +117,40 @@ def decide(applicant):
     else:
         return 1
 
+def decideAll(applicant):
+    age = applicant[0][0]
+    gender = applicant[0][1]
+    marital_status = applicant[0][2]
+    education = applicant[0][3]
+    heavy_weight = applicant[0][4]
+
+    if gender == 1:
+        if marital_status != 0:
+            if  heavy_weight <= 30 and age >= 30:
+                return 0
+            else:
+                return 1 # female not married with heavy weight >= 30 and age <= 30
+        else:
+            if education == 3:
+                return 1 # hi education female married
+            else:
+                return 0 # low education female married
+    else:
+        #return 1 # male
+        if education == 3:
+            return 1 # hi education female married
+        else:
+            return 0 
+
 
 #FITNESS FUNCTION
 
-p = fitness(decide)
+p = fitness(decideAll)
 
 result = []
 
 #number of individuals (matrixs)
-pop_size = 50
+pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
 gene_size = 1000
 #number of features
@@ -179,13 +204,13 @@ parents = Individual.evaluate_population(parents)
 
 
 
-
 # print initial, random population + Fitness Function for each individual
 # ****
 #util.print_population(parents, generation=0)
 
 # generation_counter is an optional convenience for generation tracking
 generation_counter = util.inc_generation(context=context)
+
 
 #results = []
 while generation_counter.generation() < 50:
