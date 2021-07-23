@@ -37,8 +37,8 @@ from datetime import datetime
 
 
 
-now = datetime.now().strftime("%Y%m%d_%H%M%S")
-sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/adult_GA_output_Chain'+now+'.out', 'w')
+#now = datetime.now().strftime("%Y%m%d_%H%M%S")
+#sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/decisional_GA_output_CMI'+now+'.out', 'w')
 
 
 
@@ -177,7 +177,7 @@ def decideAll(applicant):
 
 #FITNESS FUNCTION
 
-p = fitness(decideAll)
+p = fitness(decide)
 
 result = []
 
@@ -190,6 +190,7 @@ num_genes = len(var)
 
 features = ["age","gender","marital_status","education","lift_heavy_weight"]
 bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
+#bounds = [(2,3),(0,1),(0,1),(0,1),(20,21),(30,34)]
 
 
 def set_Partition():
@@ -350,4 +351,4 @@ shap.summary_plot(shap_values,
 
 print()
 
-sys.stdout.close()
+#sys.stdout.close()

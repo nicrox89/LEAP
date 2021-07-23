@@ -82,3 +82,4 @@ __MACOSX
 # dask
 dask-worker-space/
 
+*.out
