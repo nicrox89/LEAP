@@ -88,8 +88,8 @@ import random
 from shap import plots
 #import xgboost
 
-now = datetime.now().strftime("%Y%m%d_%H%M%S")
-sys.stdout = open('experiments/tailored_ML_GA_Adult_rf/adult_GA_output'+now, 'w')
+#now = datetime.now().strftime("%Y%m%d_%H%M%S")
+#sys.stdout = open('experiments/tailored_ML_GA_Adult_rf/adult_GA_output'+now+'.out', 'w')
 
 
 
@@ -195,12 +195,12 @@ X_train, X_validation, Y_train, Y_validation = train_test_split(X,Y,
 results = []
 names = []
 
-#kfold = KFold(n_splits=10)#, random_state=seed)
+kfold = KFold(n_splits=10)#, random_state=seed)
 #cv_results = cross_val_score(LinearRegression(), X_train, Y_train, cv=kfold, scoring='accuracy')
 #cv_results = cross_val_score(RandomForestRegressor(), X_train, Y_train, cv=kfold, scoring='accuracy')
-#cv_results = cross_val_score(LogisticRegression(), X_train, Y_train, cv=kfold, scoring='accuracy')
-#msg = "%s: %f (%f)" % ("LR", cv_results.mean(), cv_results.std())
-#print(msg)
+cv_results = cross_val_score(LogisticRegression(), X_train, Y_train, cv=kfold, scoring='accuracy')
+msg = "%s: %f (%f)" % ("LR", cv_results.mean(), cv_results.std())
+print(msg)
 
 # Finalize Model
 
@@ -220,39 +220,43 @@ names = []
 # Build the model with the random forest regression algorithm:
 # model = RandomForestRegressor(max_depth=6, random_state=0, n_estimators=10)
 # model.fit(X_train, Y_train)
-from sklearn.ensemble import RandomForestClassifier
-from numpy import mean
-from numpy import std
-model = RandomForestClassifier(n_estimators=100)
-model.fit(X_train, Y_train)
-scores = evaluate_model(X_train, Y_train, model)
-print('Mean Accuracy: %.3f (%.3f)' % (mean(scores), std(scores)))
+
+#RF ---
+# from sklearn.ensemble import RandomForestClassifier
+# from numpy import mean
+# from numpy import std
+# model = RandomForestClassifier(n_estimators=100)
+# model.fit(X_train, Y_train)
+# scores = evaluate_model(X_train, Y_train, model)
+# print('Mean Accuracy: %.3f (%.3f)' % (mean(scores), std(scores)))
+# ----
 
 #Logistic Regression
-# logistic_regression = LogisticRegression()
-# logistic_regression.fit(X_train, Y_train)
-# predictions = logistic_regression.predict(X_validation)
-# print("Accuracy: %s%%" % (100*accuracy_score(Y_validation, predictions)))
-# print(confusion_matrix(Y_validation, predictions))
-# print(classification_report(Y_validation, predictions))
+logistic_regression = LogisticRegression()
+logistic_regression.fit(X_train, Y_train)
+predictions = logistic_regression.predict(X_validation)
+print("Accuracy: %s%%" % (100*accuracy_score(Y_validation, predictions)))
+print(confusion_matrix(Y_validation, predictions))
+print(classification_report(Y_validation, predictions))
 
 # Prediction
 new_record = [[39,1,12,13,5,3,0,0,0,2174,0,40]]
-#print(logistic_regression.predict(new_record)[0])
+print(logistic_regression.predict(new_record)[0])
 
-print(model.predict(new_record)[0])
+#print(model.predict(new_record)[0])
 
 
 
 #FITNESS FUNCTION
 
-classifier = model
+#classifier = model
+classifier = logistic_regression
 p = fitness(classifier)
 
 result = []
 
 #number of individuals (matrixs)
-pop_size = 50
+pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
 gene_size = 1000
 #number of features
@@ -264,8 +268,8 @@ bounds = [(min(dataset["age"]),max(dataset["age"])),(min(dataset["workclass"]),m
 
 def set_Partition():
         #num_partition_features = 2
-        minPartition_size = 1
-        maxPartition_size = num_genes-1
+        minPartition_size = 2
+        maxPartition_size = 2
         #maxPartition_size = num_genes-1
         num_partition_features = random.randint(minPartition_size,maxPartition_size)
         partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
@@ -405,5 +409,5 @@ while generation_counter.generation() < 50:
 
 print()
 
-sys.stdout.close()
+#sys.stdout.close()
 

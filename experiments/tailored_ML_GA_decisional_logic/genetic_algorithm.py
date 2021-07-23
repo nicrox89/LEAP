@@ -33,13 +33,19 @@ from sklearn.metrics import accuracy_score
 
 import shap
 import pickle
+from datetime import datetime
+
+
+
+now = datetime.now().strftime("%Y%m%d_%H%M%S")
+sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/adult_GA_output_Chain'+now+'.out', 'w')
 
 
 
 n_Ind = 3000
 var = ["age","gender","marital_status","education","lift_heavy_weight"]
 var_2 = ["age","Gender:Female","Gender:Male", "marital_status","education","lift_heavy_weight"]
-var_values = [[18,50],['F','M'],['single', 'married'],['primary', 'secondary', 'further', 'higher'],[5,50]]
+var_values = [[18,50],['F','M'],['single', 'married'],['primary', 'secondary', 'further', 'higher'],[10,50]]
 gender_values = [[1,0]]
 
 rows, cols = (n_Ind, var) 
@@ -110,6 +116,32 @@ def decide3(applicant):
     else:
         return 0
 
+def decide4(applicant):
+    gender = 1
+    heavy_weight = 4
+    marital_status = 2
+    age = 0
+    if applicant[0][gender] == 1:
+        if  applicant[0][marital_status] == 1:
+            return 1
+        else:
+            return 0
+    else:
+        return 1
+
+def decide5(applicant):
+    gender = 1
+    heavy_weight = 4
+    marital_status = 2
+    age = 0
+    if applicant[0][gender] == 1:
+        if  applicant[0][heavy_weight] >= 30:
+            return 1
+        else:
+            return 0
+    else:
+        return 1
+
 def decide(applicant):
     gender = 1
     if applicant[0][gender] == 1:
@@ -152,7 +184,7 @@ result = []
 #number of individuals (matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 1000
+gene_size = 30000
 #number of features
 num_genes = len(var)
 
@@ -317,3 +349,5 @@ shap.summary_plot(shap_values,
 
 
 print()
+
+sys.stdout.close()

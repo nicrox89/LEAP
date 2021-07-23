@@ -26,8 +26,10 @@ class fitness():
 
         #predict
         #len(chromosome) = (observations)
-        for i in range(len(chromosome)-1): #to remove the last row that represents the selected partition bit
-            y.append(self.classifier.predict([chromosome[i]])[0])
+        #for i in range(len(chromosome)-1): #to remove the last row that represents the selected partition bit
+        #    y.append(self.classifier.predict([chromosome[i]])[0])
+        
+        y = self.classifier.predict(chromosome[:-1])
 
         selected_partition_features_index = chromosome[-1]
 
@@ -46,9 +48,11 @@ class fitness():
 
         #self.chain_rule_H(ch, y, selected_partition, num_partition_features)
 
-        multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
+        #multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
 
         #multi_contribution_CMI = self.multivariate_CMI(ch, y, selected_features_index, selected_partition, num_partition_features)
+
+        multi_contribution_CMI_test = self.multivariate_CMI_TEST(ch, y, selected_features_index, selected_partition, num_partition_features)
 
         #single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
         #single_contribution_CMI, single_contribution_MI = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
@@ -77,10 +81,18 @@ class fitness():
 
 
         #OF = multi_contribution_chain
+        #OF = multi_contribution_CMI
         #OF = multi_contribution_chain + (-num_partition_features+1)
         #OF = multi_contribution_chain * math.exp(-num_partition_features)
+        #OF = multi_contribution_CMI * math.exp(-num_partition_features)
+        OF = multi_contribution_CMI_test * math.exp(-num_partition_features)
+
+
         #OF = MI 
-        OF = multi_contribution_chain/num_partition_features
+        #multi_contribution_CMI
+        #OF = multi_contribution_chain/num_partition_features
+        #OF = multi_contribution_CMI/num_partition_features
+
         #OF = multi_contribution_chain - ((num_partition_features-1)/(num_genes-1))
 
         self.stat.append([OF,partition_name,num_partition_features])
@@ -89,7 +101,7 @@ class fitness():
         #print(ch)
         print(OF,num_partition_features)
         print(partition_name)
-        print("CHAIN RULE")
+        #print("CHAIN RULE")
         #print(multi_contribution_chain)
         #print("SINGLE CONTRIBUTION CMI")
         #print(single_contribution_CMI)
@@ -203,6 +215,98 @@ class fitness():
             c = H_XYZ - H_Z - X - YY 
         else:
             c = H_XYZ - X - YY
+
+
+        del vect_YZ[:]
+        del vect_XYZ[:]
+        del vect_XZ[:]
+        del vect_Z[:]
+
+
+        return c
+
+#FORMULA MULTIVARIATE CONDITIONAL MUTUAL INFORMATION
+
+    def multivariate_CMI_TEST(self, ch, y, selected_features_index, selected_partition, num_partition_features):
+
+        vect_YZ = []
+        vect_XYZ = []
+        vect_XZ = []
+        vect_Z = []
+
+        vect_XY = []
+
+        XX = []
+        vect_xYZ = []
+        
+        # demonstration comparing with simple CMI (X;Y|Z) -----
+        # Z = np.delete(ch, [False,True,True,True,True], axis=1)
+        # vect_XYZ.append(np.array(ch[:,1]))
+        # vect_XZ.append(np.array(ch[:,1]))
+        
+
+        # demonstration comparing with CHAIN RULE (X1,X2,X2;Y) no Z -----
+        # Z = np.delete(ch, [True,True,True,True,True], axis=1)
+        # vect_XYZ.append(np.array(ch[:,0]))
+        # vect_XYZ.append(np.array(ch[:,1]))
+        # vect_XYZ.append(np.array(ch[:,2]))
+        # vect_XYZ.append(np.array(ch[:,3]))
+        # vect_XYZ.append(np.array(ch[:,4]))
+        # vect_XZ.append(np.array(ch[:,0]))
+        # vect_XZ.append(np.array(ch[:,1]))
+        # vect_XZ.append(np.array(ch[:,2]))
+        # vect_XZ.append(np.array(ch[:,3]))
+        # vect_XZ.append(np.array(ch[:,4]))
+
+
+        # demonstration single contribution multi cond (X;Y|Z,W,T,S) -----
+        # Z = np.delete(ch, [False,True,False,False,False], axis=1)
+        # vect_XYZ.append(np.array(ch[:,1]))
+        # vect_XZ.append(np.array(ch[:,1]))
+
+        # vect_XY.append(np.array(ch[:,1])) #
+        
+        Z = np.delete(ch, selected_features_index, axis=1)     #
+
+        for i in range(num_partition_features):                #
+            vect_XYZ.append(np.array(selected_partition[:,i])) #
+            vect_XZ.append(np.array(selected_partition[:,i]))  #
+
+        vect_XYZ.append(np.array(y))
+        vect_YZ.append(np.array(y))
+        
+        for j in range(len(Z[0])):
+            vect_XYZ.append(np.array(Z[:,j]))
+            vect_XZ.append(np.array(Z[:,j]))
+            vect_YZ.append(np.array(Z[:,j]))
+            vect_Z.append(np.array(Z[:,j]))
+            
+
+        H_XYZ = drv.entropy_joint(vect_XYZ, base=2, fill_value=-1, estimator='ML', keep_dims=False)
+        if len(vect_Z)!=0:
+            H_Z = drv.entropy_joint(vect_Z, base=2, fill_value=-1, estimator='ML', keep_dims=False)
+        H_YZ = drv.entropy_joint(vect_YZ, base=2, fill_value=-1, estimator='ML', keep_dims=False)
+        H_XZ = drv.entropy_joint(vect_XZ, base=2, fill_value=-1, estimator='ML', keep_dims=False)
+        #H_XY = drv.entropy_joint(vect_XY, base=2, fill_value=-1, estimator='ML', keep_dims=False) #
+
+        # vect_XYZ_lst = [list(vect_XYZ[i]) for i in range(len(vect_XYZ))]
+        # H_XYZ = self.entropy_pers(*vect_XYZ_lst)
+        # H_XYZ_test = drv.entropy_joint(vect_XYZ, base=2, fill_value=-1, estimator='ML', keep_dims=False)
+
+        # H_Z = self.entropy_pers(vect_Z)
+        # H_YZ = self.entropy_pers(vect_YZ)
+        # H_XZ = self.entropy_pers(vect_XZ)
+
+        #cc = H_XYZ - H_Z - (H_XYZ - XX[0]) - (H_XYZ - XX[1]) ..... - YY
+
+        #demonstration comparting with simple CMI (X;Y|Z)
+
+        #CMI = drv.information_mutual_conditional(ch[:,1],np.array(y),ch[:,0],cartesian_product=True)
+
+        if len(vect_Z)!=0:
+            c = (H_XZ - H_Z) - (H_XYZ - H_YZ)
+        else:
+            c = (H_XZ) - (H_XYZ - H_YZ)
 
 
         del vect_YZ[:]
