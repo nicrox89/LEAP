@@ -1,6 +1,4 @@
 import numpy as np
-from functools import reduce
-import itertools
 from pyitlib import discrete_random_variable as drv
 
 features = ["age","gender","marital_status","education","lift_heavy_weight"]
@@ -14,18 +12,11 @@ def encode_columns(arr, bounds):
         possible_values = b-a
         if(possible_values>1): # it is not binary, endcode!
             for j in range(a,b+1):
-                encoded_arr.append(np.array([binary(x, j) for x in arr[:,i]]))
+                encoded_arr.append(np.array([1 if x==j else 0 for x in arr[:,i]]))
         else:
             encoded_arr.append(arr[:,i])
         
     return np.array(encoded_arr).T
-
-
-def binary(v,t):                    
-    ret = 0
-    if v==t:
-        ret = 1
-    return ret
 
 
 tst = encode_columns(test_arr, bounds)
