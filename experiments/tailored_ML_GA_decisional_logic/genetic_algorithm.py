@@ -168,12 +168,12 @@ def decide_Test2(applicant):
     gender = 1
     heavy_weight = 4
     age = 0
-    if  applicant[0][heavy_weight] >= 16:
+    if  applicant[0][heavy_weight] >= 21:
         if applicant[0][gender] == 1:
             return 1
         else:
             return 1
-    elif applicant[0][heavy_weight] < 16:
+    elif applicant[0][heavy_weight] < 21:
         if applicant[0][age] <= 30:
             return 1
         else:
@@ -222,7 +222,7 @@ def decideAll(applicant):
 
 #FITNESS FUNCTION
 
-p = fitness(decide_Test3)
+p = fitness(decide3)
 
 result = []
 

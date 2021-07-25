@@ -98,7 +98,12 @@ class fitness():
         #OF = multi_contribution_CMI+math.exp(-(num_partition_features))
 
         #OF = ((sum(multi_contribution_CMI*list(single_contribution_MI.values())[i] for i in range (num_partition_features)))/num_partition_features)
-        OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)+(sum((np.array(list(single_contribution_MI.values())))*np.array(list(single_contribution_CMI.values()))))
+        #OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)+(sum((np.array(list(single_contribution_MI.values())))*np.array(list(single_contribution_CMI.values()))))
+        #OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)*math.exp(-sum((np.array(list(single_contribution_MI.values())))))
+        delta_ro = abs(np.std(list(single_contribution_CMI.values())) - (np.std(list(single_contribution_MI.values()))))
+        OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-delta_ro)
+
+        #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]/list(single_contribution_MI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-sum((np.array(list(single_contribution_MI.values())))))
 
         #OF = multi_contribution_CMI + (num_genes-num_partition_features)
         #OF = multi_contribution_chain/num_partition_features
