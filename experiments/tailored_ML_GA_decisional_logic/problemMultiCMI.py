@@ -31,7 +31,12 @@ class fitness():
 
         selected_partition_features_index = chromosome[-1]
 
+        #remove last row (partition)
         ch = np.array(chromosome[0:-1])     
+
+        ch[:,0] = [self.binary(x,30) for x in ch[:,0]]
+        ch[:,3] = [self.binary(x,1) for x in ch[:,3]]
+        ch[:,4] = [self.binary(x,30) for x in ch[:,4]]
 
         selected_features_index = [x==1 for x in selected_partition_features_index]
 
@@ -44,9 +49,7 @@ class fitness():
         Var_np = np.array(Var)
         partition_name = Var_np[partition_index]
 
-        ch[:-1,0] = [self.binary(x,31) for x in ch[:-1,0]]
-        ch[:-1,3] = [self.binary(x,1) for x in ch[:-1,3]]
-        ch[:-1,4] = [self.binary(x,30) for x in ch[:-1,4]]
+        
         #self.chain_rule_H(ch, y, selected_partition, num_partition_features)
 
         #multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
@@ -91,8 +94,12 @@ class fitness():
         #OF = MI 
         #OF = multi_contribution_CMI/num_partition_features
 
-        OF = (sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features
-        
+        #OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)
+        #OF = multi_contribution_CMI+math.exp(-(num_partition_features))
+
+        #OF = ((sum(multi_contribution_CMI*list(single_contribution_MI.values())[i] for i in range (num_partition_features)))/num_partition_features)
+        OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)+(sum((np.array(list(single_contribution_MI.values())))*np.array(list(single_contribution_CMI.values()))))
+
         #OF = multi_contribution_CMI + (num_genes-num_partition_features)
         #OF = multi_contribution_chain/num_partition_features
         #OF = multi_contribution_chain - ((num_partition_features-1)/(num_genes-1))
@@ -113,8 +120,8 @@ class fitness():
         print(single_contribution_MI)
         print("SINGLE CONTRIBUTION CMI ALL")
         print(single_contribution_CMI_all)
-        print("SINGLE CONTRIBUTION MI ALL")
-        print(single_contribution_MI_all)
+        # print("SINGLE CONTRIBUTION MI ALL")
+        # print(single_contribution_MI_all)s
         print()
 
   

@@ -38,7 +38,7 @@ from datetime import datetime
 
 
 #now = datetime.now().strftime("%Y%m%d_%H%M%S")
-#sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/decisional_GA_output_CMI'+now+'.out', 'w')
+#sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/decisional_GA_output_CMI_Decide_Test_100-1000-50<=30'+now+'.out', 'w')
 
 
 
@@ -83,7 +83,7 @@ def decide2(applicant):
         #r = random.randint(0, 1)
         #if r > 0:
         #if features[heavy_weight][n] >= 40:
-        if (applicant[0][age] < 30):
+        if (applicant[0][age] <= 30):
             return 1
         else:
             return 0
@@ -91,7 +91,7 @@ def decide2(applicant):
         #r = random.randint(0, 1)
         #if r > 0:
         #if features[heavy_weight][n] >= 40:
-        if (applicant[0][age] > 30):
+        if (applicant[0][age] <= 30):
             return 1
         else:
             return 0
@@ -149,6 +149,51 @@ def decide(applicant):
     else:
         return 1
 
+def decide_Test(applicant):
+    gender = 1
+    heavy_weight = 4
+    age = 0
+    if  applicant[0][heavy_weight] >= 41:
+        if applicant[0][gender] == 1:
+            return 1
+        else:
+            return 0
+    elif applicant[0][heavy_weight] < 41:
+        if applicant[0][gender] == 1:
+            return 1
+        else:
+            return 0
+
+def decide_Test2(applicant):
+    gender = 1
+    heavy_weight = 4
+    age = 0
+    if  applicant[0][heavy_weight] >= 16:
+        if applicant[0][gender] == 1:
+            return 1
+        else:
+            return 1
+    elif applicant[0][heavy_weight] < 16:
+        if applicant[0][age] <= 30:
+            return 1
+        else:
+            return 0
+
+def decide_Test3(applicant):
+    gender = 1
+    heavy_weight = 4
+    age = 0
+    if  applicant[0][gender] == 0:
+        if applicant[0][2] == 1:
+            return 1
+        else:
+            return 0
+    elif applicant[0][gender] == 1:
+        if applicant[0][age] <= 30:
+            return 1
+        else:
+            return 0
+
 def decideAll(applicant):
     age = applicant[0][0]
     gender = applicant[0][1]
@@ -177,14 +222,14 @@ def decideAll(applicant):
 
 #FITNESS FUNCTION
 
-p = fitness(decide)
+p = fitness(decide_Test3)
 
 result = []
 
 #number of individuals (matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 30000
+gene_size = 10000
 #number of features
 num_genes = len(var)
 
