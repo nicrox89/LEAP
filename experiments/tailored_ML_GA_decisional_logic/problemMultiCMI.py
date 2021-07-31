@@ -52,7 +52,7 @@ class fitness():
         
         #self.chain_rule_H(ch, y, selected_partition, num_partition_features)
 
-        #multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
+        multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
 
         multi_contribution_CMI = self.multivariate_CMI(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST = self.multivariate_CMI_TEST(ch, y, selected_features_index, selected_partition, num_partition_features)
@@ -94,15 +94,39 @@ class fitness():
         #OF = MI 
         #OF = multi_contribution_CMI/num_partition_features
 
+
         #OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)
         #OF = multi_contribution_CMI+math.exp(-(num_partition_features))
 
         #OF = ((sum(multi_contribution_CMI*list(single_contribution_MI.values())[i] for i in range (num_partition_features)))/num_partition_features)
         #OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)+(sum((np.array(list(single_contribution_MI.values())))*np.array(list(single_contribution_CMI.values()))))
         #OF = ((sum(multi_contribution_CMI*list(single_contribution_CMI.values())[i] for i in range (num_partition_features)))/num_partition_features)*math.exp(-sum((np.array(list(single_contribution_MI.values())))))
-        delta_ro = abs(np.std(list(single_contribution_CMI.values())) - (np.std(list(single_contribution_MI.values()))))
-        OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-delta_ro)
+        bool_vect_del = [False for j in range(num_partition_features)]
+        num_partition_features_test = num_partition_features - 1
+        test = []
 
+        if num_partition_features != 1:
+
+            for i in range (num_partition_features):
+                bool_vect_del = [False for j in range(num_partition_features)]
+                bool_vect_del[i] = True
+                selected_features_index_test = copy.copy(selected_features_index)
+                selected_features_index_test[partition_index[i]] = False
+                selected_partition_test = np.delete(selected_partition, bool_vect_del, axis=1)
+                multi_contribution_CMI_test = self.multivariate_CMI(ch, y, selected_features_index_test, selected_partition_test, num_partition_features_test)
+                test.append(multi_contribution_CMI_test-multi_contribution_CMI)
+        
+        delta_ro = abs(np.std(list(single_contribution_CMI.values())) - (np.std(list(single_contribution_MI.values()))))
+        #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-delta_ro)
+
+        #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]) for i in range (num_partition_features)))/num_partition_features)
+
+        if num_partition_features > 1:
+            OF=multi_contribution_CMI + ((abs(np.mean(sum(test))))/num_partition_features)
+            #OF=multi_contribution_CMI * (1-math.exp(-abs(np.mean(sum(test))))/num_partition_features)
+        else:
+            OF = multi_contribution_CMI * 2
+        
         #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]/list(single_contribution_MI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-sum((np.array(list(single_contribution_MI.values())))))
 
         #OF = multi_contribution_CMI + (num_genes-num_partition_features)
@@ -117,8 +141,8 @@ class fitness():
         print(partition_name)
         print("PARTITION JOINT CMI")
         print(multi_contribution_CMI)
-        #print("COMPARE WITH CHAIN RULE")
-        #print(multi_contribution_chain)
+        print("COMPARE WITH CHAIN RULE")
+        print(multi_contribution_chain)
         print("SINGLE CONTRIBUTION CMI")
         print(single_contribution_CMI)
         print("SINGLE CONTRIBUTION MI")

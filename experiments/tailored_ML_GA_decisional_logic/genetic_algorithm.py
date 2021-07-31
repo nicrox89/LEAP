@@ -168,12 +168,12 @@ def decide_Test2(applicant):
     gender = 1
     heavy_weight = 4
     age = 0
-    if  applicant[0][heavy_weight] >= 21:
+    if  applicant[0][heavy_weight] >= 31:
         if applicant[0][gender] == 1:
             return 1
         else:
             return 1
-    elif applicant[0][heavy_weight] < 21:
+    elif applicant[0][heavy_weight] < 31:
         if applicant[0][age] <= 30:
             return 1
         else:
@@ -222,14 +222,14 @@ def decideAll(applicant):
 
 #FITNESS FUNCTION
 
-p = fitness(decide3)
+p = fitness(decideAll)
 
 result = []
 
 #number of individuals (matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 10000
+gene_size = 1000
 #number of features
 num_genes = len(var)
 
