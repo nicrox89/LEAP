@@ -121,5 +121,3 @@ def test():
     arr_e2 = [list(tst[:,i]) for i in range(len(tst[0]))]
     e2 = drv.entropy_joint(arr_e2)
     print(tst)
-
-test()

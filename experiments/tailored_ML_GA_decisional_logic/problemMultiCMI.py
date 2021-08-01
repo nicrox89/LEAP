@@ -11,16 +11,20 @@ from functools import reduce
 import itertools
 import random
 import copy
+import map_and_encode as mp
 
 class fitness():
 
-    def __init__(self, d):
+    def __init__(self, d, vars, bounds, splits):
         self.decide = d
         self.stat = []
+        self.Var = vars
+        self.bounds = bounds
+        self.splits = splits
 
     def f(self, chromosome):
-        num_genes = len(chromosome[0]) # columns
-        Var = ["age","gender","marital_status","education","lift_heavy_weight"]
+        
+        #Var = ["age","gender","marital_status","education","lift_heavy_weight"]
         y = []
         single_contribution = []
 
@@ -30,13 +34,15 @@ class fitness():
             y.append(self.decide([chromosome[i]]))
 
         selected_partition_features_index = chromosome[-1]
+        num_genes = len(selected_partition_features_index) # columns
 
         #remove last row (partition)
-        ch = np.array(chromosome[0:-1])     
+        ch = np.array(chromosome[0:-1])   
+        ch = mp.encode_columns_splits(ch, self.bounds, self.splits)[0]  
 
-        ch[:,0] = [self.binary(x,30) for x in ch[:,0]]
-        ch[:,3] = [self.binary(x,1) for x in ch[:,3]]
-        ch[:,4] = [self.binary(x,30) for x in ch[:,4]]
+        # ch[:,0] = [self.binary(x,30) for x in ch[:,0]]
+        # ch[:,3] = [self.binary(x,1) for x in ch[:,3]]
+        # ch[:,4] = [self.binary(x,30) for x in ch[:,4]]
 
         selected_features_index = [x==1 for x in selected_partition_features_index]
 
@@ -46,7 +52,7 @@ class fitness():
         num_partition_features = sum(selected_partition_features_index)
 
         partition_index = [i for i, val in enumerate(selected_features_index) if val]
-        Var_np = np.array(Var)
+        Var_np = np.array(self.Var)
         partition_name = Var_np[partition_index]
 
         
@@ -59,16 +65,16 @@ class fitness():
         #multi_contribution_CMI_TEST_CHAIN = self.multivariate_CMI_TEST_CHAIN(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST_CHAIN2 = self.multivariate_CMI_TEST_CHAIN2(ch, y, selected_features_index, selected_partition, num_partition_features)
 
-        single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
-        single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
+        single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, self.Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
+        single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, self.Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
 
         #genes=[ch[:,0],ch[:,1],ch[:,2],ch[:,3],ch[:,4]]
 
-        #features_dict = {"".join(Var[0]):genes[0]}
+        #features_dict = {"".join(self.Var[0]):genes[0]}
         #print(d)
 
         #for k in range(len(features)):
-        #    features_dict["".join(Var[k])] = genes[k]
+        #    features_dict["".join(self.Var[k])] = genes[k]
 
         # num_partition_features = random.randint(1,num_genes-1)
         # #num_partition_features = 3
@@ -77,11 +83,11 @@ class fitness():
         # selected_partition_features_index[partition_features_index]=1
         # ch = np.append(ch,[selected_partition_features_index],axis=0)
 
-        # selected_partition_dict = {"".join(Var[sort_partition_features_index[0]]):selected_partition[:,0]}
+        # selected_partition_dict = {"".join(self.Var[sort_partition_features_index[0]]):selected_partition[:,0]}
         # n = 0
         
         # for k in sort_partition_features_index:
-        #     selected_partition_dict["".join(Var[k])] = selected_partition[:,n]
+        #     selected_partition_dict["".join(self.Var[k])] = selected_partition[:,n]
         #     n = n + 1
 
 
@@ -752,7 +758,7 @@ class fitness():
             X_ = H_XYZ_ - H_YZ_
             YY_ = H_XYZ_ - H_XZ_
 
-            var_name.append(Var[partition_index_l])
+            var_name.append(self.Var[partition_index_l])
             ind_contr.append(H_XYZ_ - H_Z_ - X_ - YY_)
 
 
@@ -835,7 +841,7 @@ class fitness():
             X_ = H_XYZ_ - H_YZ_
             YY_ = H_XYZ_ - H_XZ_
 
-            var_name.append(Var[partition_index_l])
+            var_name.append(self.Var[partition_index_l])
             ind_contr.append(H_XYZ_ - H_Z_ - X_ - YY_)
 
             test = (H_XZ_-H_Z_)-(H_XYZ_-H_YZ_)

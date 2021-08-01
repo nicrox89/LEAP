@@ -74,34 +74,62 @@ num_F = []
 y = []
 
 
-
-#FITNESS FUNCTION
-p = fitness(decideAll)
-
 result = []
 
 #number of individuals (matrixs)
-pop_size = 10
+pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 100
+gene_size = 1000
 #number of features
 num_genes = len(var)
 #numer of generations
-generations = 10
+generations = 20
 
-features = ["age","gender","marital_status","education","lift_heavy_weight"]
+features_old = ["age","gender","marital_status","education","lift_heavy_weight"]
+features = []
 bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
+splits = [3,0,0,2,3]
 #bounds = [(2,3),(0,1),(0,1),(0,1),(20,21),(30,34)]
+extended_features = sum(splits) + len(splits) - np.count_nonzero(splits)
+
+for i in range(len(splits)):
+    if splits[i] == 0:
+        features.append(features_old[i])
+    for j in range(splits[i]):
+        features.append(features_old[i]+"_"+str(j+1))
+    
+
+#FITNESS FUNCTION
+p = fitness(decide, features, bounds, splits)
+
+
+# def set_Partition():
+#         #num_partition_features = 2
+#         minPartition_size = 1
+#         maxPartition_size = num_genes-1
+#         #maxPartition_size = num_genes-1
+#         num_partition_features = random.randint(minPartition_size,maxPartition_size)
+#         partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
+#         selected_partition_features_index=np.zeros(num_genes)
+#         selected_partition_features_index[partition_features_index]=1
+#         return selected_partition_features_index
+
+
+# def init(length, seq_initializer):
+#     def create():
+#         ind = initializers.create_segmented_sequence(gene_size, create_int_vector(bounds))
+#         ind.append([int(x) for x in list(set_Partition())])
+#         return ind
+#     return create
+
 
 
 def set_Partition():
-        #num_partition_features = 2
         minPartition_size = 1
-        maxPartition_size = num_genes-1
-        #maxPartition_size = num_genes-1
+        maxPartition_size = extended_features-1
         num_partition_features = random.randint(minPartition_size,maxPartition_size)
-        partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
-        selected_partition_features_index=np.zeros(num_genes)
+        partition_features_index = random.sample(range(0, extended_features), num_partition_features)          
+        selected_partition_features_index=np.zeros(extended_features)
         selected_partition_features_index[partition_features_index]=1
         return selected_partition_features_index
 
@@ -235,6 +263,10 @@ while generation_counter.generation() < generations:
 
 #SHAPLEY VALUES
 #shap_values.shape[1]
+
+
+
+
 
 expl = shap.LinearExplainer(logistic_regression,X_train)
 shap_values = expl.shap_values(X_validation)
