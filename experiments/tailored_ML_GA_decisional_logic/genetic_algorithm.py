@@ -83,7 +83,7 @@ gene_size = 1000
 #number of features
 num_genes = len(var)
 #numer of generations
-generations = 20
+generations = 10
 
 features_old = ["age","gender","marital_status","education","lift_heavy_weight"]
 features = []
@@ -100,7 +100,7 @@ for i in range(len(splits)):
     
 
 #FITNESS FUNCTION
-p = fitness(decide, features, bounds, splits)
+p = fitness(decide_Test3, features, bounds, splits)
 
 
 # def set_Partition():

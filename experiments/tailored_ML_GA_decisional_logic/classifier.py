@@ -95,12 +95,12 @@ def decide_Test2(applicant):
     gender = 1
     heavy_weight = 4
     age = 0
-    if  applicant[0][heavy_weight] >= 31:
+    if  applicant[0][heavy_weight] >= 21:
         if applicant[0][gender] == 1:
             return 1
         else:
             return 1
-    elif applicant[0][heavy_weight] < 31:
+    elif applicant[0][heavy_weight] < 21:
         if applicant[0][age] <= 30:
             return 1
         else:
@@ -108,10 +108,10 @@ def decide_Test2(applicant):
 
 def decide_Test3(applicant):
     gender = 1
-    heavy_weight = 4
+    marital_status = 2
     age = 0
     if  applicant[0][gender] == 0:
-        if applicant[0][2] == 1:
+        if applicant[0][marital_status] == 1:
             return 1
         else:
             return 0

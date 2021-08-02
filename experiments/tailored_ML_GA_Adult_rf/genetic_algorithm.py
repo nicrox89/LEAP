@@ -72,7 +72,7 @@ y = []
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 
 from collections import Counter
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -103,7 +103,7 @@ def evaluate_model(X, y, model):
 
 
 
-sns.set(style='white', context='notebook', palette='deep')
+#sns.set(style='white', context='notebook', palette='deep')
 
 dataset = pd.read_csv("experiments/data/adult.data2.csv")
 
@@ -247,33 +247,43 @@ print(logistic_regression.predict(new_record)[0])
 
 
 
-#FITNESS FUNCTION
 
-#classifier = model
-classifier = logistic_regression
-p = fitness(classifier)
 
 result = []
 
 #number of individuals (matrixs)
-pop_size = 100
+pop_size = 10
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 1000
+gene_size = 50
 #number of features
 num_genes = len(var)
 
 feature_names = ["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
+features = []
 bounds = [(min(dataset["age"]),max(dataset["age"])),(min(dataset["workclass"]),max(dataset["workclass"])),(min(dataset["education"]),max(dataset["education"])),(min(dataset["education.num"]),max(dataset["education.num"])),(min(dataset["marital.status"]),max(dataset["marital.status"])),(min(dataset["occupation"]),max(dataset["occupation"])),(min(dataset["relationship"]),max(dataset["relationship"])),(min(dataset["race"]),max(dataset["race"])),(min(dataset["sex"]),max(dataset["sex"])),(min(dataset["capital.gain"]),max(dataset["capital.gain"])),(min(dataset["capital.loss"]),max(dataset["capital.loss"])),(min(dataset["hours.per.week"]),max(dataset["hours.per.week"]))]
+splits = [2,2,2,2,2,2,2,2,0,2,2,2]
+#bounds = [(2,3),(0,1),(0,1),(0,1),(20,21),(30,34)]
+extended_features = sum(splits) + len(splits) - np.count_nonzero(splits)
 
+for i in range(len(splits)):
+    if splits[i] == 0:
+        features.append(feature_names[i])
+    for j in range(splits[i]):
+        features.append(feature_names[i]+"_"+str(j+1))
+    
+#FITNESS FUNCTION
+
+#classifier = model
+classifier = logistic_regression
+#FITNESS FUNCTION
+p = fitness(classifier, features, bounds, splits)
 
 def set_Partition():
-        #num_partition_features = 2
-        minPartition_size = 2
-        maxPartition_size = 2
-        #maxPartition_size = num_genes-1
+        minPartition_size = 1
+        maxPartition_size = extended_features-1
         num_partition_features = random.randint(minPartition_size,maxPartition_size)
-        partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
-        selected_partition_features_index=np.zeros(num_genes)
+        partition_features_index = random.sample(range(0, extended_features), num_partition_features)          
+        selected_partition_features_index=np.zeros(extended_features)
         selected_partition_features_index[partition_features_index]=1
         return selected_partition_features_index
 
