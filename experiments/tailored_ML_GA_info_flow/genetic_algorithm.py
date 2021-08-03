@@ -35,6 +35,7 @@ import shap
 import pickle
 from datetime import datetime
 import time
+import string
 start_time = time.time()
 
 
@@ -78,6 +79,7 @@ y = []
 
 
 #classification logic
+
 
 def decide2(applicant):
     gender = 1
@@ -226,14 +228,27 @@ def decideAll(applicant):
 def decideSecret(user):
     output = 0
     confidential = 1
-    if user[0][confidential] == 1:
+    if len(user[0][confidential]) == 10:
         output = 1
     #output = 1
     return output
 
-#FITNESS FUNCTION
+def guessNumber(user):
+    confidential = 1
+    if user[0][confidential] == 1:
+        output = 0
+    output = 1
+    return output
 
-p = fitness(decide)
+
+#FITNESS FUNCTION
+#1 means string
+#0 means int
+features = ["username","password"]
+bounds = [(8,20),(8,30)]
+var_type = [1,1]
+
+p = fitness(decideSecret, features, var_type, bounds)
 
 result = []
 
@@ -242,10 +257,11 @@ pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
 gene_size = 1000
 #number of features
-num_genes = len(var)
+num_genes = len(features)
 
-features = ["age","gender","marital_status","education","lift_heavy_weight"]
-bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
+
+#features = ["age","gender","marital_status","education","lift_heavy_weight"]
+#bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
 #bounds = [(2,3),(0,1),(0,1),(0,1),(20,21),(30,34)]
 
 
@@ -263,10 +279,30 @@ def set_Partition():
 
 def init(length, seq_initializer):
     def create():
-        ind = initializers.create_segmented_sequence(gene_size, create_int_vector(bounds))
+        ind = create_segmented_sequence_string(gene_size, create_string_vector(bounds))
         ind.append([int(x) for x in list(set_Partition())])
         return ind
     return create
+        
+
+def create_segmented_sequence_string(length, seq_initializer):
+    if callable(length):
+        num_segments = length()
+    else:
+        num_segments = length
+    
+    segments = [seq_initializer() for _ in range(num_segments)]
+
+    return segments
+
+def create_string_vector(bounds):
+    def create2():
+        return [string_generator(random.randint(min_, max_)) for min_, max_ in bounds]
+
+    return create2
+
+def string_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 #create initial rand population of pop_size individuals
 

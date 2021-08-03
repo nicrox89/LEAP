@@ -146,6 +146,7 @@ dataset.isnull().sum()
 #dataset["marital.status"] = dataset["marital.status"].replace(['Married-civ-spouse','Married-spouse-absent','Married-AF-spouse'], 'Married')
 #dataset["marital.status"] = dataset["marital.status"].map({"Married":1, "Single":0})
 #dataset["marital.status"] = dataset["marital.status"].astype(int)
+var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
 
 # Convert Workclass
 dataset["workclass"] = dataset["workclass"].map({'Self-emp-inc': 0, 'State-gov': 1,'Federal-gov': 2, 'Without-pay': 3, 'Local-gov': 4,'Private': 5, 'Self-emp-not-inc': 6})
