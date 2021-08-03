@@ -72,7 +72,7 @@ y = []
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 
 from collections import Counter
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -87,9 +87,11 @@ import shap
 import random
 from shap import plots
 #import xgboost
+import time
+start_time = time.time()
 
-#now = datetime.now().strftime("%Y%m%d_%H%M%S")
-#sys.stdout = open('experiments/tailored_ML_GA_Adult_rf/adult_GA_output'+now+'.out', 'w')
+now = datetime.now().strftime("%Y%m%d_%H%M%S")
+sys.stdout = open('experiments/tailored_ML_GA_Adult_rf/adult_GA_output'+now+'.out', 'w')
 
 
 
@@ -103,7 +105,7 @@ def evaluate_model(X, y, model):
 
 
 
-sns.set(style='white', context='notebook', palette='deep')
+#sns.set(style='white', context='notebook', palette='deep')
 
 dataset = pd.read_csv("experiments/data/adult.data2.csv")
 
@@ -256,9 +258,9 @@ p = fitness(classifier)
 result = []
 
 #number of individuals (matrixs)
-pop_size = 100
+pop_size = 500
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 1000
+gene_size = 10000
 #number of features
 num_genes = len(var)
 
@@ -266,10 +268,11 @@ feature_names = ["age","workclass","education","education.num","marital.status",
 bounds = [(min(dataset["age"]),max(dataset["age"])),(min(dataset["workclass"]),max(dataset["workclass"])),(min(dataset["education"]),max(dataset["education"])),(min(dataset["education.num"]),max(dataset["education.num"])),(min(dataset["marital.status"]),max(dataset["marital.status"])),(min(dataset["occupation"]),max(dataset["occupation"])),(min(dataset["relationship"]),max(dataset["relationship"])),(min(dataset["race"]),max(dataset["race"])),(min(dataset["sex"]),max(dataset["sex"])),(min(dataset["capital.gain"]),max(dataset["capital.gain"])),(min(dataset["capital.loss"]),max(dataset["capital.loss"])),(min(dataset["hours.per.week"]),max(dataset["hours.per.week"]))]
 
 
+
 def set_Partition():
         #num_partition_features = 2
-        minPartition_size = 2
-        maxPartition_size = 2
+        minPartition_size = 1
+        maxPartition_size = num_genes-1
         #maxPartition_size = num_genes-1
         num_partition_features = random.randint(minPartition_size,maxPartition_size)
         partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
@@ -408,6 +411,6 @@ while generation_counter.generation() < 50:
 
 
 print()
-
-#sys.stdout.close()
+print("-----%sseconds-----" % (time.time()-start_time))
+sys.stdout.close()
 
