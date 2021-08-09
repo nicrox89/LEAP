@@ -15,6 +15,7 @@ from statistics import mean
 from typing import Iterator, List, Tuple, Callable
 
 import numpy as np
+from numpy.ma.core import array
 import toolz
 from toolz import curry
 
@@ -317,11 +318,13 @@ def _uniform_crossover(next_individual: Iterator,
         ind_B = np.array(ind2.genome) #
         ind_TMP = copy(ind_A) #
 
-        for i in range(len(ind1.genome[0])):
+        features_index = ind_A.features_index
+        for i in range(len(features_index)):
             if random.random() < p_swap:
-                ind_TMP[:, i] = ind_B[:, i] #
-                ind_B[:, i] = ind_A[:, i] #
-                ind_A[:, i] = ind_TMP[:, i] #
+                idx = features_index[i][-1]
+                ind_TMP[:, idx] = ind_B[:, idx] #
+                ind_B[:, idx] = ind_A[:, idx] #
+                ind_A[:, idx] = ind_TMP[:, idx] #
                 #ind1.genome[:,i], ind2.genome[:,i] = ind2.genome[:,i], ind1.genome[:,i]
 
         ind1.genome = list(ind_A) #

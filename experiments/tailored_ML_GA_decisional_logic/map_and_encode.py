@@ -18,7 +18,7 @@ def encode_columns(arr, bounds):
     return np.array(encoded_arr).T
 
 
-def encode_columns_splits(arr, bounds, num_splits):
+def encode_columns_splits(arr, bounds, num_splits, tp):
     encoded_arr = []
     splits = []
     count = 0
@@ -28,6 +28,10 @@ def encode_columns_splits(arr, bounds, num_splits):
         possible_values = b-a
         
         spl = []
+
+        pre = lambda x: x
+        if tp[i] == 1:
+            pre = lambda x: len(x)
 
         if(possible_values>1): # if it is not binary, encode!
 
@@ -50,7 +54,7 @@ def encode_columns_splits(arr, bounds, num_splits):
             #spl.append((((borders*num_splits[i])+1),b))
             
             for j in range(len(spl)):
-                encoded_arr.append(np.array([1 if x in range(spl[j][0], spl[j][1]) else 0 for x in arr[:,i]]))
+                encoded_arr.append(np.array([1 if pre(x) in range(spl[j][0], spl[j][1]) else 0 for x in arr[:,i]]))
         else:
             spl.append((0,1))
             splits.append({"group": i, "index": count, "borders": (0,1), "taken": False})

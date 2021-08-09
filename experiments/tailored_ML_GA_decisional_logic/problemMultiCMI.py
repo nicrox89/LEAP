@@ -15,12 +15,14 @@ import map_and_encode as mp
 
 class fitness():
 
-    def __init__(self, d, vars, bounds, splits):
+    def __init__(self, d, vars, bounds, splits, f_index, tp):
         self.decide = d
         self.stat = []
         self.Var = vars
         self.bounds = bounds
         self.splits = splits
+        self.f_index = f_index
+        self.tp = tp
 
     def f(self, chromosome):
         
@@ -38,7 +40,7 @@ class fitness():
 
         #remove last row (partition)
         ch = np.array(chromosome[0:-1])   
-        ch = mp.encode_columns_splits(ch, self.bounds, self.splits)[0]  
+        ch = mp.encode_columns_splits(ch, self.bounds, self.splits, self.tp)[0]  
 
         # ch[:,0] = [self.binary(x,30) for x in ch[:,0]]
         # ch[:,3] = [self.binary(x,1) for x in ch[:,3]]

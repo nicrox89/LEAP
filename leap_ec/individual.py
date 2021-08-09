@@ -61,6 +61,8 @@ class Individual:
         self.decoder = decoder
         self.fitness = None
         self.partition = None
+        self.features_index = None
+
 
     @classmethod
     def create_population(cls, n, initialize, decoder, problem):
@@ -76,6 +78,7 @@ class Individual:
         """
         # genomes = initialize(n)
         # assert(len(genomes) == n)
+
         pop = [cls(genome=initialize(), decoder=decoder, problem=problem) for _
                 in range(n)]
         print("QUI")

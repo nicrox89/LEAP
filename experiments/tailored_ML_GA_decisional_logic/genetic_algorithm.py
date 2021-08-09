@@ -32,10 +32,15 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 
 import shap
+import string
 import pickle
 from datetime import datetime
 
 from classifier import *
+import time
+start_time = time.time()
+
+
 
 
 #now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -44,7 +49,9 @@ from classifier import *
 
 
 n_Ind = 3000
-var = ["age","gender","marital_status","education","lift_heavy_weight"]
+#var = ["age","gender","marital_status","education","lift_heavy_weight"]
+var = ["username",'password']
+
 var_2 = ["age","Gender:Female","Gender:Male", "marital_status","education","lift_heavy_weight"]
 var_values = [[18,50],['F','M'],['single', 'married'],['primary', 'secondary', 'further', 'higher'],[10,50]]
 gender_values = [[1,0]]
@@ -83,24 +90,42 @@ gene_size = 1000
 #number of features
 num_genes = len(var)
 #numer of generations
-generations = 10
+generations = 5
 
-features_old = ["age","gender","marital_status","education","lift_heavy_weight"]
+#features_old = ["age","gender","marital_status","education","lift_heavy_weight"]
+features_old = ["username",'password','time']
 features = []
-bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
-splits = [3,0,0,2,3]
+#bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
+bounds = [(8,20),(8,30),(0,120)]
+#splits = [3,0,0,2,3]
+splits = [3,3,3]
+#tp = [0,0,0,0,0]
+tp = [1,1,0]
 #bounds = [(2,3),(0,1),(0,1),(0,1),(20,21),(30,34)]
 extended_features = sum(splits) + len(splits) - np.count_nonzero(splits)
+features_index = []
 
+#create names for multiple features (e.g. age_1, age_2, ...)
+count = 0
 for i in range(len(splits)):
     if splits[i] == 0:
         features.append(features_old[i])
-    for j in range(splits[i]):
-        features.append(features_old[i]+"_"+str(j+1))
+        features_index.append([count])
+        count = count + 1
+    else:
+        tmp = []
+        for j in range(splits[i]):
+            features.append(features_old[i]+"_"+str(j+1))
+            tmp.append(count)
+            count = count + 1
+        features_index.append(tmp)
+    
+            
+        
     
 
 #FITNESS FUNCTION
-p = fitness(decide_Test3, features, bounds, splits)
+p = fitness(decide_Password, features, bounds, splits, features_index, tp)
 
 
 # def set_Partition():
@@ -126,20 +151,53 @@ p = fitness(decide_Test3, features, bounds, splits)
 
 def set_Partition():
         minPartition_size = 1
-        maxPartition_size = extended_features-1
+        #maxPartition_size = extended_features-1
+        maxPartition_size = num_genes
+
         num_partition_features = random.randint(minPartition_size,maxPartition_size)
-        partition_features_index = random.sample(range(0, extended_features), num_partition_features)          
-        selected_partition_features_index=np.zeros(extended_features)
-        selected_partition_features_index[partition_features_index]=1
+        #variable index
+        partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
+        #variable value index
+        idx = [features_index[x][random.sample(range(0, len(features_index[x])),1)[0]] for x in partition_features_index]
+
+        selected_partition_features_index=np.zeros(extended_features).astype('uint8')
+        selected_partition_features_index[idx]=1
         return selected_partition_features_index
 
+#original generation int variables
+# def init(length, seq_initializer):
+#     def create():
+#         ind = initializers.create_segmented_sequence(gene_size, create_int_vector(bounds))
+#         ind.append([int(x) for x in list(set_Partition())])
+#         return ind
+#     return create
 
 def init(length, seq_initializer):
     def create():
-        ind = initializers.create_segmented_sequence(gene_size, create_int_vector(bounds))
+        ind = create_segmented_sequenceMOD(gene_size, create_vector(bounds))
         ind.append([int(x) for x in list(set_Partition())])
         return ind
     return create
+
+def create_segmented_sequenceMOD(length, seq_initializer):
+
+    if callable(length):
+        num_segments = length()
+    else:
+        num_segments = length
+
+    segments = [seq_initializer() for _ in range(num_segments)]
+
+    return segments
+
+def create_vector(bound):
+    def create():
+        return [string_generator(random.randint(bounds[i][0],bounds[i][1])) if tp[i] == 1 else random.randint(bounds[i][0],bounds[i][1])  for i in range(len(bounds))]
+    return create
+
+def string_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 
 #create initial rand population of pop_size individuals
 
@@ -149,6 +207,8 @@ parents = Individual.create_population(n=pop_size,
                                        problem=FunctionProblem(p.f, True))
 
 
+for i in range(len(parents)):
+    setattr(parents[i], "features_index", features_index)
 
 # with open('parents.pickle', 'wb') as f:
 #    pickle.dump(parents, f)
@@ -265,7 +325,7 @@ while generation_counter.generation() < generations:
 #shap_values.shape[1]
 
 
-
+print("--- %s seconds ---" % (time.time() - start_time))
 
 
 expl = shap.LinearExplainer(logistic_regression,X_train)

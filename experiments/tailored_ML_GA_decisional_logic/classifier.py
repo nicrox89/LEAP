@@ -146,3 +146,11 @@ def decideAll(applicant):
         else:
             return 0 
 
+def decide_Password(user):
+    output = 0
+    usr = 0
+    psw = 1
+    if len(user[0][psw]) == 20:
+        output = 1
+    #output = 1
+    return output
