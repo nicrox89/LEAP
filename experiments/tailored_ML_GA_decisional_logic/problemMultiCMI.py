@@ -123,9 +123,12 @@ class fitness():
 
         if num_partition_features > 1:
             OF=multi_contribution_CMI + ((abs(np.mean(sum(test))))/num_partition_features)
+            #OF=multi_contribution_CMI + ((abs(np.mean((test))))/num_partition_features)
+            #OF=multi_contribution_CMI
             #OF=multi_contribution_CMI * (1-math.exp(-abs(np.mean(sum(test))))/num_partition_features)
         else:
             OF = multi_contribution_CMI * 2
+            #OF=multi_contribution_CMI
         
         #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]/list(single_contribution_MI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-sum((np.array(list(single_contribution_MI.values())))))
 

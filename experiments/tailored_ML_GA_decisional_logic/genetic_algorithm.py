@@ -41,8 +41,9 @@ start_time = time.time()
 
 
 
-#now = datetime.now().strftime("%Y%m%d_%H%M%S")
-#sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/decisional_GA_output_CMI_Decide_Test_100-1000-50<=30'+now+'.out', 'w')
+now = datetime.now().strftime("%Y%m%d_%H%M%S")
+#sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/decisional_GA_output_changedDecfullCMI'+now+'.out', 'w')
+#sys.stdout = open('experiments/tailored_ML_GA_decisional_logic/decisional_GA_output_onlyCMI'+now+'.out', 'w')
 
 
 
@@ -278,10 +279,16 @@ parents = Individual.create_population(n=pop_size,
 
 
 # with open('parents.pickle', 'wb') as f:
-#    pickle.dump(parents, f)
+#     pickle.dump(parents, f)
+
+
+#reload same Test Set 
 
 # with open('parents.pickle','rb') as f:
-#     parents = pickle.load(f)
+#     parents2 = pickle.load(f)
+#     for k in range(pop_size):
+#         parents[k].genome = parents2[k].genome
+
 
 # print(parents)
 
@@ -302,7 +309,7 @@ generation_counter = util.inc_generation(context=context)
 
 
 #results = []
-while generation_counter.generation() < 10:
+while generation_counter.generation() < 20:
     p.setStat()
     print("GENERATION ", generation_counter.generation()+1)
     #sequence of functions, the result of the first one will be the parameter of the next one, and so on
