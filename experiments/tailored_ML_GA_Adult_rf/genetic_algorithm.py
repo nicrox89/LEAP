@@ -5,7 +5,7 @@ from leap_ec import representation, ops
 from leap_ec.segmented_rep import initializers, decoders
 #from problems import fitness
 #from problem import fitness
-from problemMultiCMI import fitness
+from problemMultiCMI_2 import fitness
 from leap_ec.real_rep.initializers import create_real_vector
 from leap_ec.int_rep.initializers import create_int_vector
 from leap_ec.segmented_rep.initializers import create_segmented_sequence
@@ -269,9 +269,9 @@ bounds = [(min(dataset["age"]),max(dataset["age"])),(min(dataset["workclass"]),m
 
 def set_Partition():
         #num_partition_features = 2
-        minPartition_size = 2
-        maxPartition_size = 2
-        #maxPartition_size = num_genes-1
+        minPartition_size = 1
+        #maxPartition_size = 2
+        maxPartition_size = num_genes-1
         num_partition_features = random.randint(minPartition_size,maxPartition_size)
         partition_features_index = random.sample(range(0, num_genes), num_partition_features)          
         selected_partition_features_index=np.zeros(num_genes)

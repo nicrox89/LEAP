@@ -50,9 +50,9 @@ class fitness():
 
         #multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
 
-        #multi_contribution_CMI = self.multivariate_CMI(ch, y, selected_features_index, selected_partition, num_partition_features)
+        multi_contribution_CMI = self.multivariate_CMI(ch, y, selected_features_index, selected_partition, num_partition_features)
 
-        multi_contribution_CMI_test = self.multivariate_CMI_TEST(ch, y, selected_features_index, selected_partition, num_partition_features)
+        #multi_contribution_CMI_test = self.multivariate_CMI_TEST(ch, y, selected_features_index, selected_partition, num_partition_features)
 
         #single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
         #single_contribution_CMI, single_contribution_MI = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
@@ -84,8 +84,8 @@ class fitness():
         #OF = multi_contribution_CMI
         #OF = multi_contribution_chain + (-num_partition_features+1)
         #OF = multi_contribution_chain * math.exp(-num_partition_features)
-        #OF = multi_contribution_CMI * math.exp(-num_partition_features)
-        OF = multi_contribution_CMI_test * math.exp(-num_partition_features)
+        OF = multi_contribution_CMI * math.exp(-num_partition_features)
+        #OF = multi_contribution_CMI_test * math.exp(-num_partition_features)
 
 
         #OF = MI 

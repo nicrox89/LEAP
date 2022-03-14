@@ -30,6 +30,9 @@ from sklearn.model_selection import GridSearchCV, cross_val_score, StratifiedKFo
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.metrics.pairwise import cosine_similarity
+
+from scipy import spatial
 
 import shap
 import pickle
@@ -76,6 +79,9 @@ l_F = 0
 num_F = []
 
 y = []
+
+#mod
+var1_realisations = []
 
 
 #classification logic
@@ -234,7 +240,7 @@ def decideSecret(user):
 
 #FITNESS FUNCTION
 
-p = fitness(decide_Test2)
+p = fitness(decide)
 
 result = []
 
@@ -290,7 +296,6 @@ parents = Individual.create_population(n=pop_size,
 #         parents[k].genome = parents2[k].genome
 
 
-# print(parents)
 
 
 
@@ -298,18 +303,29 @@ parents = Individual.create_population(n=pop_size,
 print("INITIAL POPULATION")
 parents = Individual.evaluate_population(parents)
 
+#mod
+# for i in range(pop_size):   
+#     ind = np.array(parents[i].genome)
+#     ind = ind[0:-1]
+#     var1_realisations.append(ind[:,0])
 
+# result = 1 - spatial.distance.cosine(var1_realisations)
 
 # print initial, random population + Fitness Function for each individual
 # ****
 #util.print_population(parents, generation=0)
 
 # generation_counter is an optional convenience for generation tracking
+
+# for i in range(pop_size):
+#     print(parents[i].genome)
+
+
 generation_counter = util.inc_generation(context=context)
 
 
 #results = []
-while generation_counter.generation() < 20:
+while generation_counter.generation() < 10:
     p.setStat()
     print("GENERATION ", generation_counter.generation()+1)
     #sequence of functions, the result of the first one will be the parameter of the next one, and so on
@@ -397,6 +413,15 @@ while generation_counter.generation() < 20:
 
 #SHAPLEY VALUES
 #shap_values.shape[1]
+
+best_parent_fitness = 0
+
+for i in range (pop_size):
+    if parents[i].fitness > best_parent_fitness:
+        best_parent_fitness = parents[i].fitness
+        best_parent = parents[i]
+
+print(best_parent.genome)
 
 print("--- %s seconds ---" % (time.time() - start_time))
 

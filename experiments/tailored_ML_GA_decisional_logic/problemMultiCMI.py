@@ -140,6 +140,11 @@ class fitness():
         print("FITNESS Individual")
         #print("MULTI CMI,MI+(num_genes-num_partition_features)")
         #print(ch)
+        
+        #mod 
+        print("----")
+        #print(chromosome)
+        
         print(OF,num_partition_features)
         print(partition_name)
         print("PARTITION JOINT CMI")
