@@ -38,7 +38,7 @@ class fitness():
 
         #remove last row (partition)
         ch = np.array(chromosome[0:-1])   
-        ch = mp.encode_columns_splits(ch, self.bounds, self.splits)[0]  
+        #ch = mp.encode_columns_splits(ch, self.bounds, self.splits)[0]  
 
         # ch[:,0] = [self.binary(x,30) for x in ch[:,0]]
         # ch[:,3] = [self.binary(x,1) for x in ch[:,3]]
