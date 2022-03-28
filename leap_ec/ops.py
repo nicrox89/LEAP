@@ -18,7 +18,9 @@ import numpy as np
 import toolz
 from toolz import curry
 
-from leap_ec.individual import Individual
+#from leap_ec.individual import Individual
+
+from individual import Individual
 
 
 ##############################
