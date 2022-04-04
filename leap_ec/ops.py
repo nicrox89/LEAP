@@ -276,41 +276,12 @@ def clone(next_individual: Iterator) -> Iterator:
 ##############################
 @curry
 @iteriter_op
-def _uniform_crossover(next_individual: Iterator,
+def uniform_crossover(next_individual: Iterator,
                       p_swap: float = 0.5) -> Iterator:
-    """ Generator for recombining two individuals and passing them down the
-    line.
-
-    >>> from leap_ec.individual import Individual
-    >>> from leap_ec.ops import uniform_crossover
-
-    >>> first = Individual([0,0])
-    >>> second = Individual([1,1])
-    >>> i = iter([first, second])
-    >>> result = uniform_crossover(i)
-
-    >>> new_first = next(result)
-    >>> new_second = next(result)
-
-    :param next_individual: where we get the next individual
-    :param p_swap: how likely are we to swap each pair of genes
-    :return: two recombined individuals
-    """
 
     def _uniform_crossover(ind1, ind2, p_swap):
-        """ Recombination operator that can potentially swap any matching pair of
-        genes between two individuals with some probability.
-
-        It is assumed that ind1.genome and ind2.genome are lists of things.
-
-        :param ind1: The first individual
-        :param ind2: The second individual
-        :param p_swap:
-
-        :return: a copy of both individuals with individual.genome bits
-                 swapped based on probability
-        """
-        if len(ind1.genome[0]) != len(ind2.genome[0]):
+  
+        if len(ind1.genome) != len(ind2.genome):
             # TODO what about variable length genomes?
             raise RuntimeError(
                 'genomes must be same length for uniform crossover')
@@ -319,11 +290,11 @@ def _uniform_crossover(next_individual: Iterator,
         ind_B = np.array(ind2.genome) #
         ind_TMP = copy(ind_A) #
 
-        for i in range(len(ind1.genome[0])):
+        for i in range(len(ind1.genome)):
             if random.random() < p_swap:
-                ind_TMP[:, i] = ind_B[:, i] #
-                ind_B[:, i] = ind_A[:, i] #
-                ind_A[:, i] = ind_TMP[:, i] #
+                ind_TMP[i] = ind_B[i] #
+                ind_B[i] = ind_A[i] #
+                ind_A[i] = ind_TMP[i] #
                 #ind1.genome[:,i], ind2.genome[:,i] = ind2.genome[:,i], ind1.genome[:,i]
 
         ind1.genome = list(ind_A) #
@@ -336,9 +307,74 @@ def _uniform_crossover(next_individual: Iterator,
         parent2 = next(next_individual)
 
         child1, child2 = _uniform_crossover(parent1, parent2, p_swap)
-
+        
         yield child1
         yield child2
+
+
+# def uniform_crossover(next_individual: Iterator,
+#                       p_swap: float = 0.5) -> Iterator:
+#     """ Generator for recombining two individuals and passing them down the
+#     line.
+
+#     >>> from leap_ec.individual import Individual
+#     >>> from leap_ec.ops import uniform_crossover
+
+#     >>> first = Individual([0,0])
+#     >>> second = Individual([1,1])
+#     >>> i = iter([first, second])
+#     >>> result = uniform_crossover(i)
+
+#     >>> new_first = next(result)
+#     >>> new_second = next(result)
+
+#     :param next_individual: where we get the next individual
+#     :param p_swap: how likely are we to swap each pair of genes
+#     :return: two recombined individuals
+#     """
+
+#     def _uniform_crossover(ind1, ind2, p_swap):
+#         """ Recombination operator that can potentially swap any matching pair of
+#         genes between two individuals with some probability.
+
+#         It is assumed that ind1.genome and ind2.genome are lists of things.
+
+#         :param ind1: The first individual
+#         :param ind2: The second individual
+#         :param p_swap:
+
+#         :return: a copy of both individuals with individual.genome bits
+#                  swapped based on probability
+#         """
+#         if len(ind1.genome[0]) != len(ind2.genome[0]):
+#             # TODO what about variable length genomes?
+#             raise RuntimeError(
+#                 'genomes must be same length for uniform crossover')
+
+#         ind_A = np.array(ind1.genome) #
+#         ind_B = np.array(ind2.genome) #
+#         ind_TMP = copy(ind_A) #
+
+#         for i in range(len(ind1.genome[0])):
+#             if random.random() < p_swap:
+#                 ind_TMP[:, i] = ind_B[:, i] #
+#                 ind_B[:, i] = ind_A[:, i] #
+#                 ind_A[:, i] = ind_TMP[:, i] #
+#                 #ind1.genome[:,i], ind2.genome[:,i] = ind2.genome[:,i], ind1.genome[:,i]
+
+#         ind1.genome = list(ind_A) #
+#         ind2.genome = list(ind_B) #
+
+#         return ind1, ind2
+
+#     while True:
+#         parent1 = next(next_individual)
+#         parent2 = next(next_individual)
+
+#         child1, child2 = _uniform_crossover(parent1, parent2, p_swap)
+
+#         yield child1
+#         yield child2
 
 
 ##############################
@@ -841,3 +877,9 @@ def compute_expected_probability(expected_num_mutations: float,
     :return: the corresponding probability of mutation
     """
     return 1.0 / len(individual_genome) * expected_num_mutations
+
+
+
+
+
+

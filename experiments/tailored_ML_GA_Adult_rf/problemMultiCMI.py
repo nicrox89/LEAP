@@ -409,8 +409,11 @@ class fitness():
         single_contribution = []
 
         selected_partition = ch
-        num_partition_features = 5
-        partition_index = [0,1,2,3,4]
+        #num_partition_features = 5
+        #partition_index = [0,1,2,3,4]
+
+        num_partition_features = 12
+        partition_index = [0,1,2,3,4,5,6,7,8,9,10,11]
 
         for l in range(num_partition_features):
 

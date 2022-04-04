@@ -5,7 +5,7 @@ from leap_ec import representation, ops
 from leap_ec.segmented_rep import initializers, decoders
 #from problems import fitness
 #from problem import fitness
-from problemMultiCMI_2 import fitness
+from problemMultiCMI import fitness
 from leap_ec.real_rep.initializers import create_real_vector
 from leap_ec.int_rep.initializers import create_int_vector
 from leap_ec.segmented_rep.initializers import create_segmented_sequence
@@ -38,7 +38,8 @@ import pickle
 
 
 n_Ind = 3000
-var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
+var=['Clump Thickness', 'Uniformity of Cell Size','Uniformity of Cell Shape', 'Marginal Adhesion',
+        'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin','Normal Nucleoli', 'Mitoses']
 var_values = [[18,50],['F','M'],['single', 'married'],['primary', 'secondary', 'further', 'higher'],[5,50]]
 gender_values = [[1,0]]
 
@@ -105,9 +106,8 @@ def evaluate_model(X, y, model):
 
 sns.set(style='white', context='notebook', palette='deep')
 
-dataset = pd.read_csv("experiments/data/adult.data2.csv")
+dataset = pd.read_csv("experiments/data/breast-cancer-red.csv")
 
-index_female = []
 
 # Check for Null Data
 dataset.isnull().sum()
@@ -116,72 +116,27 @@ dataset.isnull().sum()
 dataset = dataset.fillna(np.nan)
 
 # Peek at data
-dataset.head(2)
+print(dataset.head(2))
 
-# Reformat Column We Are Predicting
-dataset['income']=dataset['income'].map({'<=50K': 0, '>50K': 1, '<=50K.': 0, '>50K.': 1})
-dataset.head(4)
+#feature_names=['Sex_Code_Text','Ethnic_Code_Text','Language','LegalStatus','CustodyStatus','MaritalStatus','RecSupervisionLevel','Age','ScoreText']
 
-# Identify Numeric features
-numeric_features = ['age','fnlwgt','education.num','capital.gain','capital.loss','hours.per.week','income']
 
-# Identify Categorical features
-cat_features = ['workclass','education','marital.status', 'occupation', 'relationship', 'race', 'sex', 'native']
+# Remove id column
+dataset.drop(labels=["Sample code number"], axis = 1, inplace = True)
 
-# Fill Missing Category Entries
-#dataset["workclass"] = dataset["workclass"].fillna("X")
-#dataset["occupation"] = dataset["occupation"].fillna("X")
-dataset['workclass'] = dataset['workclass'].replace('?',np.nan)
-dataset['occupation'] = dataset['occupation'].replace('?',np.nan)
 
 # Drop the NaN rows now 
 dataset.dropna(how='any',inplace=True)
 
-# Confirm All Missing Data is Handled
-dataset.isnull().sum()
 
+# Peek at data
+dataset.head(2)
 
-# Create Married Column - Binary Yes(1) or No(0)
-#dataset["marital.status"] = dataset["marital.status"].replace(['Never-married','Divorced','Separated','Widowed'], 'Single')
-#dataset["marital.status"] = dataset["marital.status"].replace(['Married-civ-spouse','Married-spouse-absent','Married-AF-spouse'], 'Married')
-#dataset["marital.status"] = dataset["marital.status"].map({"Married":1, "Single":0})
-#dataset["marital.status"] = dataset["marital.status"].astype(int)
-var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
-
-# Convert Workclass
-dataset["workclass"] = dataset["workclass"].map({'Self-emp-inc': 0, 'State-gov': 1,'Federal-gov': 2, 'Without-pay': 3, 'Local-gov': 4,'Private': 5, 'Self-emp-not-inc': 6})
-
-# Convert Education
-dataset['education'] = dataset['education'].map({'Some-college': 0, 'Preschool': 1, '5th-6th': 2, 'HS-grad': 3, 'Masters': 4, '12th': 5, '7th-8th': 6, 'Prof-school': 7,'1st-4th': 8, 'Assoc-acdm': 9, 'Doctorate': 10, '11th': 11,'Bachelors': 12, '10th': 13,'Assoc-voc': 14,'9th': 15}).astype(int)
-
-# Convert Marital Status
-dataset['marital.status'] = dataset["marital.status"].map({"Married-spouse-absent": 0, "Widowed": 1, "Married-civ-spouse": 2, "Separated": 3, "Divorced": 4,"Never-married": 5, "Married-AF-spouse": 6}).astype(int)
-
-# Convert Occupation
-dataset['occupation'] = dataset['occupation'].map({ 'Farming-fishing': 1, 'Tech-support': 2, 'Adm-clerical': 3, 'Handlers-cleaners': 4, 'Prof-specialty': 5,'Machine-op-inspct': 6, 'Exec-managerial': 7,'Priv-house-serv': 8,'Craft-repair': 9,'Sales': 10, 'Transport-moving': 11, 'Armed-Forces': 12, 'Other-service': 13,'Protective-serv':14})
-
-# Convert Relationship
-dataset['relationship'] = dataset['relationship'].map({'Not-in-family': 0, 'Wife': 1, 'Other-relative': 2, 'Unmarried': 3,'Husband': 4,'Own-child': 5}).astype(int)
-
-# Convert Race value (White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black) to numbers
-dataset["race"] = dataset["race"].map({"White":0, "Asian-Pac-Islander":1, "Amer-Indian-Eskimo":2, "Other":3, "Black":4})
-
-# Convert Sex value to 0 and 1
-dataset["sex"] = dataset["sex"].map({"Male":0, "Female":1})
-
-
-
-# Drop the data we don't want to use
-dataset.drop(labels=["fnlwgt","native.country"], axis = 1, inplace = True)
-print('Dataset with Dropped Labels')
-print(dataset.head())
-
-feature_names=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week","income"]
 
 # Split-out Validation Dataset and Create Test Variables
 array = dataset.values
-X = array[:,0:12]
-Y = array[:,12]
+X = array[:,0:9]
+Y = array[:,9]
 print('Split Data: X')
 print(X)
 print('Split Data: Y')
@@ -241,8 +196,8 @@ print(confusion_matrix(Y_validation, predictions))
 print(classification_report(Y_validation, predictions))
 
 # Prediction
-new_record = [[39,1,12,13,5,3,0,0,0,2174,0,40]]
-print(logistic_regression.predict(new_record)[0])
+#new_record = [[39,1,12,13,5,3,0,0,0,2174,0,40]]
+#print(logistic_regression.predict(new_record)[0])
 
 #print(model.predict(new_record)[0])
 
@@ -259,12 +214,13 @@ result = []
 #number of individuals (matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 100000
+gene_size = 10000
 #number of features
 num_genes = len(var)
 
-feature_names = ["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
-bounds = [(min(dataset["age"]),max(dataset["age"])),(min(dataset["workclass"]),max(dataset["workclass"])),(min(dataset["education"]),max(dataset["education"])),(min(dataset["education.num"]),max(dataset["education.num"])),(min(dataset["marital.status"]),max(dataset["marital.status"])),(min(dataset["occupation"]),max(dataset["occupation"])),(min(dataset["relationship"]),max(dataset["relationship"])),(min(dataset["race"]),max(dataset["race"])),(min(dataset["sex"]),max(dataset["sex"])),(min(dataset["capital.gain"]),max(dataset["capital.gain"])),(min(dataset["capital.loss"]),max(dataset["capital.loss"])),(min(dataset["hours.per.week"]),max(dataset["hours.per.week"]))]
+feature_names = ['Clump Thickness', 'Uniformity of Cell Size','Uniformity of Cell Shape', 'Marginal Adhesion',
+        'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin','Normal Nucleoli', 'Mitoses']
+bounds = [(min(dataset["Clump Thickness"]),max(dataset["Clump Thickness"])),(min(dataset["Uniformity of Cell Size"]),max(dataset["Uniformity of Cell Size"])),(min(dataset["Uniformity of Cell Shape"]),max(dataset["Uniformity of Cell Shape"])),(min(dataset["Marginal Adhesion"]),max(dataset["Marginal Adhesion"])),(min(dataset["Single Epithelial Cell Size"]),max(dataset["Single Epithelial Cell Size"])),(min(dataset["Bare Nuclei"]),max(dataset["Bare Nuclei"])),(min(dataset["Bland Chromatin"]),max(dataset["Bland Chromatin"])),(min(dataset["Normal Nucleoli"]),max(dataset["Normal Nucleoli"])),(min(dataset["Mitoses"]),max(dataset["Mitoses"]))]
 
 
 def set_Partition():

@@ -18,12 +18,15 @@ class fitness():
         #self.decide = d
         self.stat = []
 
-    def f(self, chromosome, data, y):
+    def f(self, chromosome, data, y, b):
         num_genes = len(chromosome) # columns
         Var = ["age","gender","marital_status","education","lift_heavy_weight"]
-        single_contribution = []
-
-        selected_partition_features_index = chromosome
+        #Var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
+        #Var = ['Clump Thickness', 'Uniformity of Cell Size','Uniformity of Cell Shape', 'Marginal Adhesion',
+        #'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin','Normal Nucleoli', 'Mitoses']
+        #single_contribution = []
+        selected_partition_features_index = chromosome # [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] #[0, 1, 0, 0, 0] 
+        unselected_partition_features_index = list(np.logical_not(chromosome).astype(int))
 
         #remove last row (partition)
         ch = np.array(data)     
@@ -33,28 +36,38 @@ class fitness():
         #ch[:,4] = [self.binary(x,30) for x in ch[:,4]]
 
         selected_features_index = [x==1 for x in selected_partition_features_index]
+        unselected_features_index = [x==1 for x in unselected_partition_features_index]
 
         # selected_features_index = boolean selected features array
         selected_partition = ch[:,selected_features_index]
+        unselected_partition = ch[:,unselected_features_index]
 
         num_partition_features = sum(selected_partition_features_index)
+        num_unselected_partition_features = sum(unselected_partition_features_index)
 
         partition_index = [i for i, val in enumerate(selected_features_index) if val]
         Var_np = np.array(Var)
         partition_name = Var_np[partition_index]
 
+        unselected_partition_index = [i for i, val in enumerate(unselected_features_index) if val]
+        Var_np = np.array(Var)
+        unselected_partition_name = Var_np[unselected_partition_index]
+
         
         #self.chain_rule_H(ch, y, selected_partition, num_partition_features)
 
-        multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
+        #multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
 
         multi_contribution_CMI = self.multivariate_CMI(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST = self.multivariate_CMI_TEST(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST_CHAIN = self.multivariate_CMI_TEST_CHAIN(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST_CHAIN2 = self.multivariate_CMI_TEST_CHAIN2(ch, y, selected_features_index, selected_partition, num_partition_features)
+        multi_contribution_CMI_unselected = self.multivariate_CMI(ch, y, unselected_features_index, unselected_partition, num_unselected_partition_features)
 
-        single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
+        #*--
+        #single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
         single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
+        #--*
 
         #genes=[ch[:,0],ch[:,1],ch[:,2],ch[:,3],ch[:,4]]
 
@@ -110,7 +123,26 @@ class fitness():
                 multi_contribution_CMI_test = self.multivariate_CMI(ch, y, selected_features_index_test, selected_partition_test, num_partition_features_test)
                 test.append(multi_contribution_CMI_test-multi_contribution_CMI)
         
-        delta_ro = abs(np.std(list(single_contribution_CMI.values())) - (np.std(list(single_contribution_MI.values()))))
+
+        bool_vect_del_UP = [False for j in range(num_unselected_partition_features)]
+        num_unselected_partition_features_test= num_unselected_partition_features - 1
+        test_UP = []
+
+        if num_unselected_partition_features != 1:
+
+            for i in range (num_unselected_partition_features):
+                bool_vect_del_UP = [False for j in range(num_unselected_partition_features)]
+                bool_vect_del_UP[i] = True
+                unselected_features_index_test = copy.copy(unselected_features_index)
+                unselected_features_index_test[unselected_partition_index[i]] = False
+                unselected_partition_test = np.delete(unselected_partition, bool_vect_del_UP, axis=1)
+                multi_contribution_CMI_test_UP = self.multivariate_CMI(ch, y, unselected_features_index_test, unselected_partition_test, num_unselected_partition_features_test)
+                test_UP.append(multi_contribution_CMI_test_UP-multi_contribution_CMI_unselected)
+        
+        #*--
+        #delta_ro = abs(np.std(list(single_contribution_CMI.values())) - (np.std(list(single_contribution_MI.values()))))
+        #--*
+
         #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-delta_ro)
 
         #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]) for i in range (num_partition_features)))/num_partition_features)
@@ -124,6 +156,13 @@ class fitness():
             OF = multi_contribution_CMI * 2
             #OF=multi_contribution_CMI
         
+        if num_unselected_partition_features > 1:
+            OF_UP = multi_contribution_CMI_unselected + ((abs(np.mean(sum(test_UP))))/num_unselected_partition_features)
+            #OF=multi_contribution_CMI + ((abs(np.mean((test))))/num_partition_features)
+            #OF=multi_contribution_CMI
+            #OF=multi_contribution_CMI * (1-math.exp(-abs(np.mean(sum(test))))/num_partition_features)
+        else:
+            OF_UP = multi_contribution_CMI_unselected * 2
         #OF = ((sum(multi_contribution_CMI*(list(single_contribution_CMI.values())[i]/list(single_contribution_MI.values())[i]) for i in range (num_partition_features)))/num_partition_features)*math.exp(-sum((np.array(list(single_contribution_MI.values())))))
 
         #OF = multi_contribution_CMI + (num_genes-num_partition_features)
@@ -131,30 +170,51 @@ class fitness():
         #OF = multi_contribution_chain - ((num_partition_features-1)/(num_genes-1))
         self.stat.append([OF,partition_name,num_partition_features])
 
-        print("FITNESS Individual")
+        #*---
+        #print("FITNESS Individual")
+        #---*
+
         #print("MULTI CMI,MI+(num_genes-num_partition_features)")
         #print(ch)
         
         #mod 
-        print("----")
+
+        #*---
+        #print("----")
+        #---*
+
         #print(chromosome)
         
-        print(OF,num_partition_features)
-        print(partition_name)
-        print("PARTITION JOINT CMI")
-        print(multi_contribution_CMI)
-        print("COMPARE WITH CHAIN RULE")
-        print(multi_contribution_chain)
-        print("SINGLE CONTRIBUTION CMI")
-        print(single_contribution_CMI)
-        print("SINGLE CONTRIBUTION MI")
-        print(single_contribution_MI)
-        print("SINGLE CONTRIBUTION CMI ALL")
-        print(single_contribution_CMI_all)
-        # print("SINGLE CONTRIBUTION MI ALL")
-        # print(single_contribution_MI_all)s
-        print()
+        #*---
+        if b:
+            print()
+            print()
+            print(OF,num_partition_features)
+            print(partition_name)
+            # 1 print("SELECTED PART JOINT CMI")
+            # 1 print(multi_contribution_CMI)
+            # 1 print("---")
+            print(OF_UP,num_unselected_partition_features)
+            print(unselected_partition_name)
+            # 1 print("NON SELECTED PART JOINT CMI")
+            # 1 print(multi_contribution_CMI_unselected)
+            # 1 print("---")
+            # print("COMPARE WITH CHAIN RULE")
+            # print(multi_contribution_chain)
+            #print("SINGLE CONTRIBUTION CMI")
+            #print(single_contribution_CMI)
+            # print("SINGLE CONTRIBUTION MI")
+            # print(single_contribution_MI)
+            # 1 print("SINGLE CONTRIBUTION CMI ALL")
+            # 1 print(single_contribution_CMI_all)
+            #---*
 
+            # 1 print("SINGLE CONTRIBUTION MI ALL")
+            # 1 print(single_contribution_MI_all)
+
+            #*---
+            #print()
+            #---*
   
         return OF
 
@@ -799,6 +859,12 @@ class fitness():
         selected_partition = ch
         num_partition_features = 5
         partition_index = [0,1,2,3,4]
+
+        #num_partition_features = 12
+        #partition_index = [0,1,2,3,4,5,6,7,8,9,10,11]
+
+        #num_partition_features = 9
+        #partition_index = [0,1,2,3,4,5,6,7,8]
 
         for l in range(num_partition_features):
 

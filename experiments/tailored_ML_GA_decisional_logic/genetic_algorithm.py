@@ -247,7 +247,7 @@ result = []
 #number of individuals (matrixs)
 pop_size = 100
 #number of instances for each gene(variable) = number of records(observations) of the matrix
-gene_size = 1000
+gene_size = 10000
 #number of features
 num_genes = len(var)
 

@@ -42,8 +42,8 @@ class Individual:
         
         return population
 
-    def get_fitness(self):
-        self.fitness = self.fit.f(self.genome, self.data, self.y)
+    def get_fitness(self, b):
+        self.fitness = self.fit.f(self.genome, self.data, self.y, b)
 
     def clone(self):
         """Create a 'clone' of this `Individual`, copying the genome, but not
@@ -69,17 +69,5 @@ class Individual:
         cloned.fitness = None
         return cloned
 
-    def evaluate(self):
-        """ determine this individual's fitness
-
-        This is done by outsourcing the fitness evaluation to the associated
-        Problem object since it "knows" what is good or bad for a given
-        phenome.
-
-
-        :see also: ScalarProblem.worse_than
-
-        :return: the calculated fitness
-        """
-        self.fitness = self.get_fitness()
-        return self.fitness
+    #def evaluate(self):
+    #    self.get_fitness()

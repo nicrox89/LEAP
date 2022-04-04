@@ -10,6 +10,8 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics.pairwise import cosine_similarity
+from leap_ec.int_rep.ops import mutate_randint, individual_mutate_randint
+
 
 from scipy import spatial
 
@@ -22,6 +24,7 @@ from toolz import pipe
 from leap_ec import probe
 from typing import Iterator, List
 from copy import copy
+from toolz import curry
 
 
 var = ["age","gender","marital_status","education","lift_heavy_weight"]
@@ -32,9 +35,10 @@ p = fitness()
 
 result = []
 y = []
+TestSuite = []
 
 #number of Test Cases (1 matrix)
-TS_size = 10
+TS_size = 100000
 
 #number of individuals/instances = partitions
 pop_size = 10
@@ -47,19 +51,39 @@ num_generations = 10
 
 features = ["age","gender","marital_status","education","lift_heavy_weight"]
 bounds = [(18,50),(0,1),(0,1),(0,3),(10,50)]
+binary_bounds = [(0,1),(0,1),(0,1),(0,1),(0,1)]
 
 
 #create Test Suite
-features_inst = [[]for j in range(num_genes)]
-TestSuite = []
+# features_inst = [[]for j in range(num_genes)]
+# TestSuite = []
 
-for k in range(num_genes):
-    features_inst[k] = [random.randint(bounds[k][0],bounds[k][1]) for i in range(TS_size)]
+# for k in range(num_genes):
+#     features_inst[k] = [random.randint(bounds[k][0],bounds[k][1]) for i in range(TS_size)]
 
-temp = np.array(features_inst)
+# temp = np.array(features_inst)
 
-for i in range(TS_size):
-    TestSuite.append(temp[:,i])
+# for i in range(TS_size):
+#     TestSuite.append(temp[:,i])
+
+
+def decode_columns(arr, bounds):
+    d_arr = []
+    for i in range(len(arr)):
+        _min, _max = bounds[i]
+        value = arr[i]
+        if (_max - _min) == 1:
+            d_arr.append(round(value))
+        else:
+            d_arr.append(round(value*(_max-_min)+_min))
+    return d_arr
+
+
+TS = np.random.uniform(0,1,(TS_size,num_genes))
+for i in range (len(TS)):
+    TestSuite.append(decode_columns(TS[i],bounds))
+    TestSuite[i]=np.array(TestSuite[i])
+    #TestSuite = TestSuite.astype(int)
 
 
 #female=1 male=0
@@ -96,42 +120,43 @@ def tournament_selection(population: List, k: int = 2) -> Iterator:
         
         yield best
 
+@curry
+def mutate(next_individual: Iterator)-> Iterator:
+    #swapping of zero with one to retain no of features required
+    #for individual in population:
+    print("before")
+    individual = next(next_individual)
+    print(individual.genome)
+    index_1 = random.randrange(len(individual.genome))
+    index_2 = random.randrange(len(individual.genome))
+    while(index_2==index_1 and individual.genome[index_1] != individual.genome[index_2]):
+        index_2 = random.randrange(len(individual.genome))
 
-def _uniform_crossover(next_individual: Iterator,
-                      p_swap: float = 0.5) -> Iterator:
+    #swapping the bits
+    temp = individual.genome[index_1]
+    individual.genome[index_1] = individual.genome[index_2]
+    individual.genome[index_2] = temp
+    print("after")
+    print(individual.genome)
+    yield individual
 
-    def _uniform_crossover(ind1, ind2, p_swap):
-  
-        if len(ind1.genome) != len(ind2.genome):
-            # TODO what about variable length genomes?
-            raise RuntimeError(
-                'genomes must be same length for uniform crossover')
+@curry
+def pool(next_individual: Iterator, size: int) -> List:
+    print(size)
+    return [next(next_individual) for _ in range(size)]
 
-        ind_A = np.array(ind1.genome) #
-        ind_B = np.array(ind2.genome) #
-        ind_TMP = copy(ind_A) #
 
-        for i in range(len(ind1.genome)):
-            if random.random() < p_swap:
-                ind_TMP[i] = ind_B[i] #
-                ind_B[i] = ind_A[i] #
-                ind_A[i] = ind_TMP[i] #
-                #ind1.genome[:,i], ind2.genome[:,i] = ind2.genome[:,i], ind1.genome[:,i]
+best_parent_fitness = 0
 
-        ind1.genome = list(ind_A) #
-        ind2.genome = list(ind_B) #
+for i in range (pop_size):
+    if population[i].fitness > best_parent_fitness:
+        best_parent_fitness = population[i].fitness
+        best_parent = population[i]
 
-        return ind1, ind2
-
-    while True:
-        parent1 = next(next_individual)
-        parent2 = next(next_individual)
-
-        child1, child2 = _uniform_crossover(parent1, parent2, p_swap)
-
-        yield child1
-        yield child2
-
+print("GENERATION 0 - BEST INDIVIDUAL:")
+print(best_parent.genome)
+print(best_parent.fitness)
+print()
 
 generation_counter = util.inc_generation(context=context)
 
@@ -150,16 +175,29 @@ while generation_counter.generation() < num_generations:
                      #individual_mutate_randint,
                      #probe.print_individual(prefix='after mutation: '),
                      #probe.print_individual(prefix='before crossover: \n'),
-                     _uniform_crossover(p_swap=0.2),
+                     ops.uniform_crossover(p_swap=0.2),
+                     #mutate,
                      #probe.print_individual(prefix='after crossover: \n\n\n'),
                      ops.evaluate,
                      ops.pool(size=len(population)))  # accumulate offspring
 
-   
+
     population = offspring
  
 
     #print(probe.best_of_gen(parents))
+
+    best_parent_fitness = 0
+
+    for i in range (pop_size):
+        if population[i].fitness > best_parent_fitness:
+            best_parent_fitness = population[i].fitness
+            best_parent = population[i]
+
+    print("GENERATION - ",  generation_counter.generation()+1, "BEST INDIVIDUAL:")
+    print(best_parent.genome)
+    print(best_parent.fitness)
+    print()
 
     generation_counter()  # increment to the next generation
 
@@ -198,14 +236,7 @@ while generation_counter.generation() < num_generations:
 
  
 
-best_parent_fitness = 0
 
-for i in range (pop_size):
-    if parents[i].fitness > best_parent_fitness:
-        best_parent_fitness = parents[i].fitness
-        best_parent = parents[i]
-
-print(best_parent.genome)
 
 
 

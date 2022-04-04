@@ -20,7 +20,8 @@ class fitness():
 
     def f(self, chromosome):
         num_genes = len(chromosome[0]) # columns
-        Var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
+        Var = ['Clump Thickness', 'Uniformity of Cell Size','Uniformity of Cell Shape', 'Marginal Adhesion',
+        'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin','Normal Nucleoli', 'Mitoses']
         y = []
         single_contribution = []
 
@@ -440,8 +441,8 @@ class fitness():
         single_contribution = []
 
         selected_partition = ch
-        num_partition_features = 12
-        partition_index = [0,1,2,3,4,5,6,7,8,9,10,11]
+        num_partition_features = 9
+        partition_index = [0,1,2,3,4,5,6,7,8,9]
 
         for l in range(num_partition_features):
 
