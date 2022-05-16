@@ -67,7 +67,7 @@ class fitness():
 
         #*--
         #single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
-        single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
+        #single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
         #--*
 
         #genes=[ch[:,0],ch[:,1],ch[:,2],ch[:,3],ch[:,4]]

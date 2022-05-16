@@ -15,18 +15,40 @@ import copy
 class fitness():
 
     def __init__(self):
-        #self.decide = d
         self.stat = []
 
-    def f(self, chromosome, data, y, b):
+    def f(self, chromosome, data, y, b, var):
         num_genes = len(chromosome) # columns
-        Var = ["age","gender","marital_status","education","lift_heavy_weight"]
-        #Var=["age","workclass","education","education.num","marital.status","occupation","relationship","race","sex","capital.gain","capital.loss","hours.per.week"]
-        #Var = ['Clump Thickness', 'Uniformity of Cell Size','Uniformity of Cell Shape', 'Marginal Adhesion',
-        #'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin','Normal Nucleoli', 'Mitoses']
-        #single_contribution = []
-        #chromosome = [0, 1, 0, 0, 0]
-        selected_partition_features_index = chromosome #[0, 1, 0, 0, 0] #chromosome # [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] #[0, 1, 0, 0, 0] 
+        
+        Var = var
+        
+        # byte_data = [[]for j in range(len(data))]
+        # hs_data = [[]for j in range(len(data))]
+        
+
+
+
+  
+        # import hashlib
+
+        # for i in range(len(data)):
+        #     byte_data[i].append(bytes(data[i][0], 'utf-8'))
+        #     byte_data[i].append(bytes(data[i][1], 'utf-8'))
+        
+        # for i in range(len(data)):
+        #     hs_data[i].append(hashlib.md5(byte_data[i][0]))
+        #     hs_data[i].append(hashlib.md5(byte_data[i][1]))
+
+        # for i in range(len(data)):
+        #     data2[i].append(hs_data[i][0].digest())
+        #     data2[i].append(hs_data[i][1].digest())
+
+        #print(result.digest())
+
+    
+        #chromosome = [0,0,0,1,0,0]
+
+        selected_partition_features_index =   chromosome # [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] #[0, 1, 0, 0, 0] 
         unselected_partition_features_index = list(np.logical_not(chromosome).astype(int))
 
         #remove last row (partition)
@@ -59,16 +81,17 @@ class fitness():
 
         #multi_contribution_chain = self.chain_rule(ch, y, selected_partition, num_partition_features)
 
+
         multi_contribution_CMI = self.multivariate_CMI(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST = self.multivariate_CMI_TEST(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST_CHAIN = self.multivariate_CMI_TEST_CHAIN(ch, y, selected_features_index, selected_partition, num_partition_features)
         #multi_contribution_CMI_TEST_CHAIN2 = self.multivariate_CMI_TEST_CHAIN2(ch, y, selected_features_index, selected_partition, num_partition_features)
         multi_contribution_CMI_unselected = self.multivariate_CMI(ch, y, unselected_features_index, unselected_partition, num_unselected_partition_features)
 
-        #*--
+
+
         #single_contribution_CMI, single_contribution_MI = self.single_CMI(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
-        single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
-        #--*
+        #single_contribution_CMI_all, single_contribution_MI_all = self.single_CMI_all(partition_name, Var, num_genes, ch, y, partition_index, selected_features_index, selected_partition, num_partition_features)
 
         #genes=[ch[:,0],ch[:,1],ch[:,2],ch[:,3],ch[:,4]]
 
@@ -858,14 +881,8 @@ class fitness():
         single_contribution = []
 
         selected_partition = ch
-        num_partition_features = 5
-        partition_index = [0,1,2,3,4]
-
-        #num_partition_features = 12
-        #partition_index = [0,1,2,3,4,5,6,7,8,9,10,11]
-
-        #num_partition_features = 9
-        #partition_index = [0,1,2,3,4,5,6,7,8]
+        num_partition_features = num_genes
+        partition_index = [i for i in range(num_genes)]
 
         for l in range(num_partition_features):
 
@@ -1099,6 +1116,12 @@ class fitness():
     def binary(self,v,t):                    
         ret = 0
         if v>t:
+            ret = 1
+        return ret
+
+    def binaryString(self,v,t):                    
+        ret = 0
+        if len(v)>t:
             ret = 1
         return ret
 
